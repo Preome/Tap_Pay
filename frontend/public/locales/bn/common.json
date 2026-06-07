@@ -1,0 +1,17 @@
+{
+  "walletBalance": "ওয়ালেট ব্যালেন্স",
+  "availableBalance": "উপলব্ধ ব্যালেন্স",
+  "sendMoney": "টাকা পাঠান",
+  "receiverPhone": "প্রাপকের ফোন নম্বর",
+  "amount": "পরিমাণ",
+  "pin": "পিন",
+  "processing": "প্রক্রিয়াকরণ...",
+  "requiredField": "এই ক্ষেত্রটি প্রয়োজনীয়",
+  "minAmountError": "পরিমাণ কমপক্ষে ১ হতে হবে",
+  "sendMoneySuccess": "টাকা সফলভাবে পাঠানো হয়েছে!",
+  "sendMoneyError": "টাকা পাঠাতে ব্যর্থ হয়েছে। আবার চেষ্টা করুন।",
+  "transactionHistory": "লেনদেনের ইতিহাস",
+  "date": "তারিখ",
+  "type": "ধরন",
+  "status": "অবস্থা"
+}
