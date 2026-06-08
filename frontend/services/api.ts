@@ -9,9 +9,11 @@ const api = axios.create({
   },
 });
 
+const publicEndpoints = ['/api/v1/login/', '/api/v1/users/register/'];
+
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
-  if (token) {
+  if (token && !publicEndpoints.some(endpoint => config.url?.includes(endpoint))) {
     config.headers.Authorization = `Token ${token}`;
   }
   return config;
