@@ -170,7 +170,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
 
         try:
             from merchants.models import Merchant
-            merchant = Merchant.objects.select_related('user__wallet').get(trade_license_number=merchant_code, is_verified=True)
+            merchant = Merchant.objects.select_related('user__wallet').get(registration_number=merchant_code, is_verified=True)
 
             with db_transaction.atomic():
                 user_wallet = Wallet.objects.select_for_update().get(user=user)

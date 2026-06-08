@@ -41,4 +41,13 @@ export const transactionAPI = {
     api.get('/api/v1/transactions/summary/'),
 };
 
+export const merchantAPI = {
+  lookup: (code: string) =>
+    api.get(`/api/v1/merchants/lookup/${code}/`),
+  getMyMerchant: () =>
+    api.get('/api/v1/merchants/my_merchant/'),
+  getQrUrl: (code: string) =>
+    `${API_BASE_URL}/api/v1/merchants/qr/${code}/`,
+};
+
 export default api;

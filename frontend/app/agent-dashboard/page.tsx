@@ -11,12 +11,14 @@ import {
   ArrowPathIcon,
   ClockIcon
 } from '@heroicons/react/24/outline';
+import { useTranslation } from 'react-i18next';
 import CashInForm from '@/components/Transactions/CashInForm';
 import TransactionHistory from '@/components/Transactions/TransactionHistory';
 import { authAPI, transactionAPI } from '@/services/api';
 import toast from 'react-hot-toast';
 
 export default function AgentDashboard() {
+  const { t } = useTranslation();
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -41,7 +43,7 @@ export default function AgentDashboard() {
       const parsedUser = JSON.parse(userData);
       
       if ((parsedUser.user_type || parsedUser.userType) !== 'AGENT') {
-        toast.error('Access denied. Agent only area.');
+        toast.error(t('auth.accessDenied'));
         router.push('/');
         return;
       }
@@ -84,10 +86,10 @@ export default function AgentDashboard() {
   };
 
   const dashboardStats = [
-    { label: "Today's Cash In", value: `৳ ${stats.cashInTotal.toLocaleString()}`, icon: BanknotesIcon, change: '', color: 'bg-green-500' },
-    { label: "Today's Cash Out", value: `৳ ${stats.cashOutTotal.toLocaleString()}`, icon: ArrowTrendingUpIcon, change: '', color: 'bg-red-500' },
-    { label: 'Customers Served', value: stats.customersServed.toString(), icon: UsersIcon, change: '', color: 'bg-blue-500' },
-    { label: 'Commission Earned', value: `৳ ${stats.commission.toLocaleString()}`, icon: UserPlusIcon, change: '', color: 'bg-purple-500' },
+    { label: t('agent.todaysCashIn'), value: `৳ ${stats.cashInTotal.toLocaleString()}`, icon: BanknotesIcon, change: '', color: 'bg-green-500' },
+    { label: t('agent.todaysCashOut'), value: `৳ ${stats.cashOutTotal.toLocaleString()}`, icon: ArrowTrendingUpIcon, change: '', color: 'bg-red-500' },
+    { label: t('agent.customersServed'), value: stats.customersServed.toString(), icon: UsersIcon, change: '', color: 'bg-blue-500' },
+    { label: t('agent.commissionEarned'), value: `৳ ${stats.commission.toLocaleString()}`, icon: UserPlusIcon, change: '', color: 'bg-purple-500' },
   ];
 
   if (loading) {
@@ -95,7 +97,7 @@ export default function AgentDashboard() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading dashboard...</p>
+          <p className="mt-4 text-gray-600">{t('common.loading')}...</p>
         </div>
       </div>
     );
@@ -107,22 +109,22 @@ export default function AgentDashboard() {
         <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-6 text-white">
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-2xl font-bold">Agent Dashboard</h1>
+              <h1 className="text-2xl font-bold">{t('agent.dashboard')}</h1>
               <div className="mt-2">
-                <p className="text-lg">Welcome back, {user?.username || 'Agent'}!</p>
+                <p className="text-lg">{t('agent.welcomeBack')}, {user?.username || 'Agent'}!</p>
                 <div className="flex items-center space-x-4 mt-2 text-sm">
                   <span className="bg-white bg-opacity-20 px-3 py-1 rounded-full">
-                    Phone: {user?.phone_number}
+                    {t('common.phone')}: {user?.phone_number}
                   </span>
                   <span className="bg-white bg-opacity-20 px-3 py-1 rounded-full">
-                    ID: {user?.id}
+                    {t('common.id')}: {user?.id}
                   </span>
                 </div>
               </div>
             </div>
             <div className="text-right">
               <div className="bg-white bg-opacity-20 rounded-lg px-4 py-2">
-                <p className="text-sm">Today's Date</p>
+                <p className="text-sm">{t('common.today')}</p>
                 <p className="text-lg font-semibold">{new Date().toLocaleDateString()}</p>
               </div>
             </div>
@@ -130,11 +132,11 @@ export default function AgentDashboard() {
           
           <div className="mt-4 grid grid-cols-2 gap-4">
             <div className="bg-white bg-opacity-20 rounded-lg px-4 py-3">
-              <p className="text-sm opacity-90">Agent Balance</p>
+              <p className="text-sm opacity-90">{t('agent.agentBalance')}</p>
               <p className="text-2xl font-bold">৳ {balance.toLocaleString()}</p>
             </div>
             <div className="bg-white bg-opacity-20 rounded-lg px-4 py-3">
-              <p className="text-sm opacity-90">Today's Commission</p>
+              <p className="text-sm opacity-90">{t('agent.todaysCommission')}</p>
               <p className="text-2xl font-bold">৳ {stats.commission.toLocaleString()}</p>
             </div>
           </div>
@@ -166,7 +168,7 @@ export default function AgentDashboard() {
                 }`}
               >
                 <BanknotesIcon className="h-4 w-4 inline mr-2" />
-                Cash In Service
+                {t('agent.cashInService')}
               </button>
               <button
                 onClick={() => setActiveTab('history')}
@@ -177,7 +179,7 @@ export default function AgentDashboard() {
                 }`}
               >
                 <ArrowPathIcon className="h-4 w-4 inline mr-2" />
-                Transaction History
+                {t('agent.transactionHistory')}
               </button>
               <button
                 onClick={() => setActiveTab('customers')}
@@ -188,7 +190,7 @@ export default function AgentDashboard() {
                 }`}
               >
                 <UsersIcon className="h-4 w-4 inline mr-2" />
-                My Customers
+                {t('agent.myCustomers')}
               </button>
               <button
                 onClick={() => setActiveTab('activities')}
@@ -199,7 +201,7 @@ export default function AgentDashboard() {
                 }`}
               >
                 <ClockIcon className="h-4 w-4 inline mr-2" />
-                Recent Activities
+                {t('agent.recentActivities')}
               </button>
             </div>
           </div>
@@ -210,22 +212,19 @@ export default function AgentDashboard() {
             {activeTab === 'customers' && (
               <div className="text-center py-8">
                 <UsersIcon className="h-12 w-12 mx-auto mb-3 text-gray-400" />
-                <p className="text-gray-500">Your customer list will appear here</p>
-                <button className="mt-4 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
-                  + Add New Customer
-                </button>
+                <p className="text-gray-500">{t('common.comingSoon')}</p>
               </div>
             )}
             {activeTab === 'activities' && (
               <div className="space-y-3">
                 {recentTransactions.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">No recent activities</div>
+                  <div className="text-center py-8 text-gray-500">{t('agent.noRecentActivities')}</div>
                 ) : (
                   recentTransactions.map((tx: any) => (
                     <div key={tx.id} className="flex items-center justify-between p-4 border rounded-lg">
                       <div>
                         <p className="font-medium text-gray-800">
-                          {tx.transaction_type === 'CASH_IN' ? 'Cash In' : tx.transaction_type} - {tx.receiver_phone || tx.sender_phone || ''}
+                          {tx.transaction_type === 'CASH_IN' ? t('transaction.cashIn') : tx.transaction_type} - {tx.receiver_phone || tx.sender_phone || ''}
                         </p>
                         <p className="text-sm text-gray-500">
                           {new Date(tx.created_at).toLocaleString('en-US', {
@@ -238,7 +237,7 @@ export default function AgentDashboard() {
                         <p className={`text-xs ${
                           tx.status === 'COMPLETED' ? 'text-green-600' : 'text-yellow-600'
                         }`}>
-                          {tx.status}
+                          {tx.status === 'COMPLETED' ? t('transaction.completed') : tx.status}
                         </p>
                       </div>
                     </div>

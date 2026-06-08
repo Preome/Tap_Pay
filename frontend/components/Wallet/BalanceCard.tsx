@@ -1,6 +1,7 @@
 'use client';
 
-import { BanknotesIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
+import { BanknotesIcon } from '@heroicons/react/24/outline';
+import { useTranslation } from 'react-i18next';
 
 interface BalanceCardProps {
   balance: number;
@@ -8,12 +9,14 @@ interface BalanceCardProps {
 }
 
 export default function BalanceCard({ balance, currency = 'BDT' }: BalanceCardProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <p className="text-sm opacity-90">Total Balance</p>
-          <h3 className="text-2xl font-bold mt-1">Wallet</h3>
+          <p className="text-sm opacity-90">{t('user.totalBalance')}</p>
+          <h3 className="text-2xl font-bold mt-1">{t('nav.wallet')}</h3>
         </div>
         <BanknotesIcon className="h-10 w-10 opacity-90" />
       </div>
@@ -22,7 +25,7 @@ export default function BalanceCard({ balance, currency = 'BDT' }: BalanceCardPr
         <p className="text-4xl font-bold">
           {currency} {balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </p>
-        <p className="text-sm mt-2 opacity-80">Available Balance</p>
+        <p className="text-sm mt-2 opacity-80">{t('user.availableBalance')}</p>
       </div>
       
       <div className="mt-4 pt-4 border-t border-blue-400">

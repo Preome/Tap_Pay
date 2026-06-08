@@ -10,12 +10,15 @@ import {
   BellIcon,
   CreditCardIcon
 } from '@heroicons/react/24/outline';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '@/components/I18n/LanguageSwitcher';
 
 interface DashboardLayoutProps {
   children: ReactNode;
 }
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
+  const { t } = useTranslation();
   const router = useRouter();
 
   const handleLogout = () => {
@@ -24,10 +27,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   };
 
   const navigation = [
-    { name: 'Dashboard', icon: HomeIcon, href: '#' },
-    { name: 'Transactions', icon: ArrowPathIcon, href: '#' },
-    { name: 'Wallet', icon: CreditCardIcon, href: '#' },
-    { name: 'Profile', icon: UserIcon, href: '#' },
+    { name: t('nav.dashboard'), icon: HomeIcon, href: '#' },
+    { name: t('nav.transactions'), icon: ArrowPathIcon, href: '#' },
+    { name: t('nav.wallet'), icon: CreditCardIcon, href: '#' },
+    { name: t('nav.profile'), icon: UserIcon, href: '#' },
   ];
 
   return (
@@ -36,7 +39,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         <div className="p-6">
           <div className="flex items-center space-x-2 mb-8">
             <span className="text-2xl"></span>
-            <h1 className="text-xl font-bold text-gray-800">Tap Pay</h1>
+            <h1 className="text-xl font-bold text-gray-800">{t('app.name')}</h1>
           </div>
           
           <nav className="space-y-2">
@@ -59,7 +62,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             className="flex items-center space-x-3 px-4 py-2 text-red-600 rounded-lg hover:bg-red-50 transition-colors w-full"
           >
             <ArrowRightOnRectangleIcon className="h-5 w-5" />
-            <span>Logout</span>
+            <span>{t('nav.logout')}</span>
           </button>
         </div>
       </aside>
@@ -68,9 +71,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         <header className="bg-white shadow-sm sticky top-0 z-10">
           <div className="flex justify-between items-center px-8 py-4">
             <div>
-              <h2 className="text-2xl font-semibold text-gray-800">Dashboard</h2>
+              <h2 className="text-2xl font-semibold text-gray-800">{t('nav.dashboard')}</h2>
             </div>
             <div className="flex items-center space-x-4">
+              <LanguageSwitcher />
               <button className="relative p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
                 <BellIcon className="h-5 w-5" />
                 <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>

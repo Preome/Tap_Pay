@@ -5,11 +5,14 @@ import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/Layout/DashboardLayout';
 import BalanceCard from '@/components/Wallet/BalanceCard';
 import SendMoneyForm from '@/components/Transactions/SendMoneyForm';
+import MerchantPaymentForm from '@/components/Transactions/MerchantPaymentForm';
 import TransactionHistory from '@/components/Transactions/TransactionHistory';
 import { ArrowPathIcon, ArrowUpIcon, ArrowDownIcon, CreditCardIcon } from '@heroicons/react/24/outline';
+import { useTranslation } from 'react-i18next';
 import { authAPI, transactionAPI } from '@/services/api';
 
 export default function UserDashboard() {
+  const { t } = useTranslation();
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [balance, setBalance] = useState(0);
@@ -60,10 +63,10 @@ export default function UserDashboard() {
   };
 
   const quickActions = [
-    { icon: ArrowUpIcon, label: 'Send Money', color: 'bg-blue-500', tab: 'send' },
-    { icon: ArrowDownIcon, label: 'Cash In', color: 'bg-green-500', tab: 'cashin' },
-    { icon: CreditCardIcon, label: 'Pay Merchant', color: 'bg-purple-500', tab: 'merchant' },
-    { icon: ArrowPathIcon, label: 'Transactions', color: 'bg-orange-500', tab: 'history' },
+    { icon: ArrowUpIcon, label: t('user.sendMoney'), color: 'bg-blue-500', tab: 'send' },
+    { icon: ArrowDownIcon, label: t('user.cashIn'), color: 'bg-green-500', tab: 'cashin' },
+    { icon: CreditCardIcon, label: t('user.payMerchant'), color: 'bg-purple-500', tab: 'merchant' },
+    { icon: ArrowPathIcon, label: t('user.transactions'), color: 'bg-orange-500', tab: 'history' },
   ];
 
   if (loading) {
@@ -71,7 +74,7 @@ export default function UserDashboard() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading dashboard...</p>
+          <p className="mt-4 text-gray-600">{t('common.loadingDashboard')}...</p>
         </div>
       </div>
     );
@@ -81,12 +84,12 @@ export default function UserDashboard() {
     <DashboardLayout>
       <div className="space-y-6">
         <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-6 text-white">
-          <h1 className="text-2xl font-bold">Welcome back, {user?.username || 'User'}!</h1>
-          <p className="mt-2 opacity-90">Manage your finances, send money, and make payments easily.</p>
+          <h1 className="text-2xl font-bold">{t('user.welcomeBack')}, {user?.username || 'User'}!</h1>
+          <p className="mt-2 opacity-90">{t('user.manageFinances')}</p>
         </div>
 
         <div>
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h2>
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">{t('user.quickActions')}</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {quickActions.map((action, index) => (
               <button
@@ -109,14 +112,12 @@ export default function UserDashboard() {
 
         {activeTab === 'cashin' && (
           <div className="bg-white rounded-xl p-6 text-center">
-            <p className="text-gray-500">Visit an agent to cash in.</p>
+            <p className="text-gray-500">{t('user.visitAgent')}</p>
           </div>
         )}
 
         {activeTab === 'merchant' && (
-          <div className="bg-white rounded-xl p-6 text-center">
-            <p className="text-gray-500">Merchant payment coming soon.</p>
-          </div>
+          <MerchantPaymentForm onSuccess={() => { fetchDashboardData(); setActiveTab(null); }} />
         )}
 
         {activeTab !== 'send' && (
@@ -124,18 +125,18 @@ export default function UserDashboard() {
             <div className="lg:col-span-1 space-y-6">
               <BalanceCard balance={balance} />
               <div className="bg-white rounded-xl p-4">
-                <h3 className="font-semibold text-gray-800 mb-3">Quick Stats</h3>
+                <h3 className="font-semibold text-gray-800 mb-3">{t('user.quickStats')}</h3>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Total Sent:</span>
+                    <span className="text-gray-600">{t('user.totalSent')}:</span>
                     <span className="font-semibold">৳ {stats.totalSent.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Total Received:</span>
+                    <span className="text-gray-600">{t('user.totalReceived')}:</span>
                     <span className="font-semibold">৳ {stats.totalReceived.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Transactions:</span>
+                    <span className="text-gray-600">{t('user.transactionCount')}:</span>
                     <span className="font-semibold">{stats.transactionCount}</span>
                   </div>
                 </div>

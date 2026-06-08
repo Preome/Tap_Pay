@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ArrowUpIcon, ArrowDownIcon, CreditCardIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 import { transactionAPI } from '@/services/api';
 
@@ -20,6 +21,7 @@ interface Transaction {
 }
 
 export default function TransactionHistory() {
+  const { t } = useTranslation();
   const [filter, setFilter] = useState('all');
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
@@ -55,10 +57,10 @@ export default function TransactionHistory() {
   
   const getTransactionTitle = (type: string, data: Transaction) => {
     switch(type) {
-      case 'SEND_MONEY': return `Sent to ${data.receiver_phone || data.receiver}`;
-      case 'CASH_IN': return `Cash In from ${data.agent_phone || data.agent || 'Agent'}`;
-      case 'CASH_OUT': return `Cash Out to ${data.receiver_phone || data.receiver}`;
-      case 'MERCHANT_PAYMENT': return `Payment to merchant`;
+      case 'SEND_MONEY': return `${t('transaction.sentTo')} ${data.receiver_phone || data.receiver}`;
+      case 'CASH_IN': return `${t('transaction.cashInFrom')} ${data.agent_phone || data.agent || 'Agent'}`;
+      case 'CASH_OUT': return `${t('transaction.cashOutTo')} ${data.receiver_phone || data.receiver}`;
+      case 'MERCHANT_PAYMENT': return t('transaction.paymentToMerchant');
       default: return 'Transaction';
     }
   };
@@ -80,25 +82,25 @@ export default function TransactionHistory() {
   return (
     <div className="bg-white rounded-xl shadow-md p-6">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold text-gray-800">Transaction History</h2>
+        <h2 className="text-xl font-semibold text-gray-800">{t('transaction.history')}</h2>
         
         <select
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          <option value="all">All Transactions</option>
-          <option value="SEND_MONEY">Send Money</option>
-          <option value="CASH_IN">Cash In</option>
-          <option value="CASH_OUT">Cash Out</option>
-          <option value="MERCHANT_PAYMENT">Merchant Payment</option>
+          <option value="all">{t('transaction.all')}</option>
+          <option value="SEND_MONEY">{t('transaction.sendMoney')}</option>
+          <option value="CASH_IN">{t('transaction.cashIn')}</option>
+          <option value="CASH_OUT">{t('transaction.cashOut')}</option>
+          <option value="MERCHANT_PAYMENT">{t('transaction.merchantPayment')}</option>
         </select>
       </div>
       
       <div className="space-y-3">
         {filteredTransactions.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
-            No transactions found
+            {t('transaction.noTransactions')}
           </div>
         ) : (
           filteredTransactions.map((transaction) => (
@@ -137,7 +139,10 @@ export default function TransactionHistory() {
                   transaction.status === 'PENDING' ? 'bg-yellow-100 text-yellow-600' :
                   'bg-red-100 text-red-600'
                 }`}>
-                  {transaction.status}
+                  {transaction.status === 'COMPLETED' ? t('transaction.completed') :
+                   transaction.status === 'PENDING' ? t('transaction.pending') :
+                   transaction.status === 'FAILED' ? t('transaction.failed') :
+                   transaction.status}
                 </p>
               </div>
             </div>
@@ -147,7 +152,7 @@ export default function TransactionHistory() {
       
       <div className="mt-4 pt-4 border-t">
         <button className="text-blue-600 text-sm font-medium hover:text-blue-700">
-          View All Transactions →
+          {t('transaction.viewAll')}
         </button>
       </div>
     </div>
