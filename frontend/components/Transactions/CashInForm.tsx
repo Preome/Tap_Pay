@@ -68,11 +68,11 @@ export default function CashInForm() {
           <input
             {...register('amount', { 
               required: 'Amount is required',
-              min: { value: 100, message: 'Minimum cash in is 100 BDT' },
+              min: { value: 0.01, message: 'Minimum amount is 0.01 BDT' },
               max: { value: 100000, message: 'Maximum cash in is 100,000 BDT' }
             })}
             type="number"
-            step="1"
+            step="0.01"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             placeholder="0.00"
           />

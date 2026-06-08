@@ -74,11 +74,11 @@ export default function SendMoneyForm({ onSuccess }: SendMoneyFormProps) {
           <input
             {...register('amount', { 
               required: 'Amount is required',
-              min: { value: 10, message: 'Minimum amount is 10 BDT' },
+              min: { value: 0.01, message: 'Minimum amount is 0.01 BDT' },
               max: { value: 50000, message: 'Maximum amount is 50,000 BDT' }
             })}
             type="number"
-            step="1"
+            step="0.01"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="0.00"
           />
