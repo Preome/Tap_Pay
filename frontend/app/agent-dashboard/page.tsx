@@ -39,8 +39,8 @@ export default function AgentDashboard() {
       console.log('Parsed user data:', parsedUser);
       console.log('User type:', parsedUser.userType);
       
-      if (parsedUser.userType !== 'AGENT') {
-        console.error('User is not an agent! User type:', parsedUser.userType);
+      if ((parsedUser.user_type || parsedUser.userType) !== 'AGENT') {
+        console.error('User is not an agent! User type:', parsedUser.user_type);
         toast.error('Access denied. Agent only area.');
         router.push('/');
         return;

@@ -14,7 +14,7 @@ export default function Header() {
           <div className="flex items-center space-x-4">
             <div className="text-2xl font-bold">TAP PAY</div>
             <div className="hidden md:flex space-x-4">
-              <span className="text-sm bg-blue-500 px-3 py-1 rounded-full">User: John Doe</span>
+              <span className="text-sm bg-blue-500 px-3 py-1 rounded-full">User: </span>
               <span className="text-sm bg-green-500 px-3 py-1 rounded-full">Verified</span>
             </div>
           </div>
