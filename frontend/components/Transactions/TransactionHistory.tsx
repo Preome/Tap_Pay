@@ -11,10 +11,12 @@ interface Transaction {
   amount: number;
   sender: number | null;
   receiver: number | null;
+  agent: number | null;
   status: string;
   created_at: string;
   sender_phone?: string;
   receiver_phone?: string;
+  agent_phone?: string;
 }
 
 export default function TransactionHistory() {
@@ -54,7 +56,7 @@ export default function TransactionHistory() {
   const getTransactionTitle = (type: string, data: Transaction) => {
     switch(type) {
       case 'SEND_MONEY': return `Sent to ${data.receiver_phone || data.receiver}`;
-      case 'CASH_IN': return `Cash In from ${data.sender_phone || data.sender}`;
+      case 'CASH_IN': return `Cash In from ${data.agent_phone || data.agent || 'Agent'}`;
       case 'CASH_OUT': return `Cash Out to ${data.receiver_phone || data.receiver}`;
       case 'MERCHANT_PAYMENT': return `Payment to merchant`;
       default: return 'Transaction';

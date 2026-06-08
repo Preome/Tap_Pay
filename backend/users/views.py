@@ -63,7 +63,8 @@ class TransactionViewSet(viewsets.ModelViewSet):
 
         queryset = queryset.annotate(
             sender_phone=F('sender__phone_number'),
-            receiver_phone=F('receiver__phone_number')
+            receiver_phone=F('receiver__phone_number'),
+            agent_phone=F('agent__phone_number')
         )
 
         return queryset
