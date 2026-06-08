@@ -97,24 +97,24 @@ export default function MerchantDashboard() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-6 text-white">
-          <h1 className="text-2xl font-bold">{t('merchant.dashboard')}</h1>
-          <p className="mt-2">{t('merchant.welcomeBack')}, {user?.username || 'Merchant'}!</p>
-          <div className="mt-4 flex items-center space-x-4">
-            <div className="bg-white bg-opacity-20 rounded-lg px-4 py-2">
-              <p className="text-sm">{t('merchant.walletBalance')}</p>
-              <p className="text-xl font-bold">৳ {balance.toLocaleString()}</p>
+        <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-4 md:p-6 text-white">
+          <h1 className="text-xl md:text-2xl font-bold">{t('merchant.dashboard')}</h1>
+          <p className="mt-1 md:mt-2 text-sm md:text-base">{t('merchant.welcomeBack')}, {user?.username || 'Merchant'}!</p>
+          <div className="mt-3 md:mt-4 grid grid-cols-2 gap-2 md:gap-4">
+            <div className="bg-white bg-opacity-20 rounded-lg px-3 md:px-4 py-2">
+              <p className="text-xs md:text-sm">{t('merchant.walletBalance')}</p>
+              <p className="text-lg md:text-xl font-bold">৳ {balance.toLocaleString()}</p>
             </div>
-            <div className="bg-white bg-opacity-20 rounded-lg px-4 py-2">
-              <p className="text-sm">{t('merchant.todaysEarnings')}</p>
-              <p className="text-xl font-bold">৳ {stats.salesTotal.toLocaleString()}</p>
+            <div className="bg-white bg-opacity-20 rounded-lg px-3 md:px-4 py-2">
+              <p className="text-xs md:text-sm">{t('merchant.todaysEarnings')}</p>
+              <p className="text-lg md:text-xl font-bold">৳ {stats.salesTotal.toLocaleString()}</p>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
           {dashboardStats.map((stat, index) => (
-            <div key={index} className="bg-white rounded-xl p-6 shadow-sm">
+            <div key={index} className="bg-white rounded-xl p-4 md:p-6 shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <div className={`${stat.color} p-3 rounded-lg`}>
                   <stat.icon className="h-6 w-6 text-white" />
@@ -126,9 +126,9 @@ export default function MerchantDashboard() {
           ))}
         </div>
 
-        <div className="bg-white rounded-xl p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-800">
+        <div className="bg-white rounded-xl p-4 md:p-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+            <h2 className="text-lg md:text-xl font-semibold text-gray-800">
               {(merchantName || 'Merchant')} {t('merchant.qrCode')}
             </h2>
             {qrImageUrl && (
@@ -146,31 +146,31 @@ export default function MerchantDashboard() {
                     URL.revokeObjectURL(url);
                   } catch {}
                 }}
-                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm font-medium"
+                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm font-medium w-full sm:w-auto text-center"
               >
                 {t('merchant.downloadQR')}
               </button>
             )}
           </div>
-          <div className="flex items-center justify-center p-8 bg-white rounded-lg border-2 border-dashed border-gray-200">
+          <div className="flex items-center justify-center p-4 md:p-8 bg-white rounded-lg border-2 border-dashed border-gray-200">
             <div className="text-center">
               {qrImageUrl ? (
                 <img
                   src={qrImageUrl}
                   alt={`QR Code for ${merchantName}`}
-                  className="w-64 h-64 mx-auto"
+                  className="w-48 h-48 md:w-64 md:h-64 mx-auto"
                   style={{ imageRendering: 'pixelated' }}
                 />
               ) : (
-                <div className="w-64 h-64 bg-gray-100 rounded-lg flex items-center justify-center mx-auto">
-                  <QrCodeIcon className="h-32 w-32 text-gray-400" />
+                <div className="w-48 h-48 md:w-64 md:h-64 bg-gray-100 rounded-lg flex items-center justify-center mx-auto">
+                  <QrCodeIcon className="h-24 w-24 md:h-32 md:w-32 text-gray-400" />
                 </div>
               )}
-              <p className="mt-4 text-gray-600">
+              <p className="mt-3 md:mt-4 text-sm md:text-base text-gray-600">
                 {t('merchant.scanToPay')} @ {merchantName || user?.username || 'Your Store'}
               </p>
               {merchantCode && (
-                <p className="mt-1 text-sm text-gray-400 font-mono">
+                <p className="mt-1 text-xs md:text-sm text-gray-400 font-mono">
                   {t('merchant.code')}: {merchantCode}
                 </p>
               )}
@@ -178,8 +178,8 @@ export default function MerchantDashboard() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl p-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">{t('merchant.recentPayments')}</h2>
+        <div className="bg-white rounded-xl p-4 md:p-6">
+          <h2 className="text-lg md:text-xl font-semibold text-gray-800 mb-3 md:mb-4">{t('merchant.recentPayments')}</h2>
           <div className="space-y-3">
             {recentPayments.length === 0 ? (
               <div className="text-center py-8 text-gray-500">{t('merchant.noRecentPayments')}</div>

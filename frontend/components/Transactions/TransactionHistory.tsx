@@ -80,14 +80,14 @@ export default function TransactionHistory() {
   }
   
   return (
-    <div className="bg-white rounded-xl shadow-md p-6">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold text-gray-800">{t('transaction.history')}</h2>
+    <div className="bg-white rounded-xl shadow-md p-4 md:p-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+        <h2 className="text-lg md:text-xl font-semibold text-gray-800">{t('transaction.history')}</h2>
         
         <select
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full sm:w-auto px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="all">{t('transaction.all')}</option>
           <option value="SEND_MONEY">{t('transaction.sendMoney')}</option>
@@ -97,55 +97,55 @@ export default function TransactionHistory() {
         </select>
       </div>
       
-      <div className="space-y-3">
+      <div className="space-y-2 md:space-y-3">
         {filteredTransactions.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
             {t('transaction.noTransactions')}
           </div>
         ) : (
           filteredTransactions.map((transaction) => (
-            <div
-              key={transaction.id}
-              className="flex items-center justify-between p-4 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-gray-100 rounded-full">
-                  {getTransactionIcon(transaction.transaction_type)}
+              <div
+                key={transaction.id}
+                className="flex items-center justify-between p-3 md:p-4 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <div className="flex items-center space-x-2 md:space-x-3 min-w-0 flex-1">
+                  <div className="p-1.5 md:p-2 bg-gray-100 rounded-full shrink-0">
+                    {getTransactionIcon(transaction.transaction_type)}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm md:text-base font-medium text-gray-800 truncate">
+                      {getTransactionTitle(transaction.transaction_type, transaction)}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      {new Date(transaction.created_at).toLocaleString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-medium text-gray-800">
-                    {getTransactionTitle(transaction.transaction_type, transaction)}
+                
+                <div className="text-right shrink-0 ml-2">
+                  <p className={`text-sm md:text-base font-semibold ${
+                    isMoneyOut(transaction.transaction_type) ? 'text-red-600' : 'text-green-600'
+                  }`}>
+                    {isMoneyOut(transaction.transaction_type) ? '-' : '+'} 
+                    ৳ {Number(transaction.amount).toLocaleString()}
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {new Date(transaction.created_at).toLocaleString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
+                  <p className={`text-xs px-1.5 md:px-2 py-0.5 md:py-1 rounded-full inline-block mt-1 ${
+                    transaction.status === 'COMPLETED' ? 'bg-green-100 text-green-600' :
+                    transaction.status === 'PENDING' ? 'bg-yellow-100 text-yellow-600' :
+                    'bg-red-100 text-red-600'
+                  }`}>
+                    {transaction.status === 'COMPLETED' ? t('transaction.completed') :
+                     transaction.status === 'PENDING' ? t('transaction.pending') :
+                     transaction.status === 'FAILED' ? t('transaction.failed') :
+                     transaction.status}
                   </p>
                 </div>
               </div>
-              
-              <div className="text-right">
-                <p className={`font-semibold ${
-                  isMoneyOut(transaction.transaction_type) ? 'text-red-600' : 'text-green-600'
-                }`}>
-                  {isMoneyOut(transaction.transaction_type) ? '-' : '+'} 
-                  ৳ {Number(transaction.amount).toLocaleString()}
-                </p>
-                <p className={`text-xs px-2 py-1 rounded-full inline-block mt-1 ${
-                  transaction.status === 'COMPLETED' ? 'bg-green-100 text-green-600' :
-                  transaction.status === 'PENDING' ? 'bg-yellow-100 text-yellow-600' :
-                  'bg-red-100 text-red-600'
-                }`}>
-                  {transaction.status === 'COMPLETED' ? t('transaction.completed') :
-                   transaction.status === 'PENDING' ? t('transaction.pending') :
-                   transaction.status === 'FAILED' ? t('transaction.failed') :
-                   transaction.status}
-                </p>
-              </div>
-            </div>
           ))
         )}
       </div>

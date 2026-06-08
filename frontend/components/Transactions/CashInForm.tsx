@@ -35,8 +35,8 @@ export default function CashInForm() {
   };
   
   return (
-    <div className="bg-white rounded-xl shadow-md p-6">
-      <h2 className="text-xl font-semibold mb-4 text-gray-800 flex items-center">
+    <div className="bg-white rounded-xl shadow-md p-4 md:p-6">
+      <h2 className="text-lg md:text-xl font-semibold mb-3 md:mb-4 text-gray-800 flex items-center">
         <ArrowDownTrayIcon className="h-5 w-5 mr-2 text-green-600" />
         {t('transaction.cashIn')}
       </h2>

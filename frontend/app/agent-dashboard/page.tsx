@@ -106,45 +106,45 @@ export default function AgentDashboard() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-6 text-white">
-          <div className="flex justify-between items-start">
-            <div>
-              <h1 className="text-2xl font-bold">{t('agent.dashboard')}</h1>
+        <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-4 md:p-6 text-white">
+          <div className="flex flex-col sm:flex-row justify-between items-start gap-3">
+            <div className="w-full sm:w-auto">
+              <h1 className="text-xl md:text-2xl font-bold">{t('agent.dashboard')}</h1>
               <div className="mt-2">
-                <p className="text-lg">{t('agent.welcomeBack')}, {user?.username || 'Agent'}!</p>
-                <div className="flex items-center space-x-4 mt-2 text-sm">
-                  <span className="bg-white bg-opacity-20 px-3 py-1 rounded-full">
+                <p className="text-base md:text-lg">{t('agent.welcomeBack')}, {user?.username || 'Agent'}!</p>
+                <div className="flex flex-wrap items-center gap-2 mt-2 text-xs md:text-sm">
+                  <span className="bg-white bg-opacity-20 px-2 md:px-3 py-1 rounded-full">
                     {t('common.phone')}: {user?.phone_number}
                   </span>
-                  <span className="bg-white bg-opacity-20 px-3 py-1 rounded-full">
+                  <span className="bg-white bg-opacity-20 px-2 md:px-3 py-1 rounded-full">
                     {t('common.id')}: {user?.id}
                   </span>
                 </div>
               </div>
             </div>
-            <div className="text-right">
-              <div className="bg-white bg-opacity-20 rounded-lg px-4 py-2">
-                <p className="text-sm">{t('common.today')}</p>
-                <p className="text-lg font-semibold">{new Date().toLocaleDateString()}</p>
+            <div className="hidden sm:block text-right shrink-0">
+              <div className="bg-white bg-opacity-20 rounded-lg px-3 md:px-4 py-2">
+                <p className="text-xs md:text-sm">{t('common.today')}</p>
+                <p className="text-base md:text-lg font-semibold">{new Date().toLocaleDateString()}</p>
               </div>
             </div>
           </div>
           
-          <div className="mt-4 grid grid-cols-2 gap-4">
-            <div className="bg-white bg-opacity-20 rounded-lg px-4 py-3">
-              <p className="text-sm opacity-90">{t('agent.agentBalance')}</p>
-              <p className="text-2xl font-bold">৳ {balance.toLocaleString()}</p>
+          <div className="mt-3 md:mt-4 grid grid-cols-2 gap-2 md:gap-4">
+            <div className="bg-white bg-opacity-20 rounded-lg px-3 md:px-4 py-2 md:py-3">
+              <p className="text-xs md:text-sm opacity-90">{t('agent.agentBalance')}</p>
+              <p className="text-xl md:text-2xl font-bold">৳ {balance.toLocaleString()}</p>
             </div>
-            <div className="bg-white bg-opacity-20 rounded-lg px-4 py-3">
-              <p className="text-sm opacity-90">{t('agent.todaysCommission')}</p>
-              <p className="text-2xl font-bold">৳ {stats.commission.toLocaleString()}</p>
+            <div className="bg-white bg-opacity-20 rounded-lg px-3 md:px-4 py-2 md:py-3">
+              <p className="text-xs md:text-sm opacity-90">{t('agent.todaysCommission')}</p>
+              <p className="text-xl md:text-2xl font-bold">৳ {stats.commission.toLocaleString()}</p>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
           {dashboardStats.map((stat, index) => (
-            <div key={index} className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div key={index} className="bg-white rounded-xl p-4 md:p-6 shadow-sm hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between mb-4">
                 <div className={`${stat.color} p-3 rounded-lg`}>
                   <stat.icon className="h-6 w-6 text-white" />
@@ -157,56 +157,56 @@ export default function AgentDashboard() {
         </div>
 
         <div className="bg-white rounded-xl shadow-sm">
-          <div className="border-b">
-            <div className="flex space-x-4 px-6 overflow-x-auto">
+          <div className="border-b overflow-x-auto">
+            <div className="flex px-4 md:px-6 min-w-max">
               <button
                 onClick={() => setActiveTab('cashin')}
-                className={`py-3 px-4 font-medium transition-colors whitespace-nowrap ${
+                className={`py-3 px-3 md:px-4 font-medium transition-colors whitespace-nowrap text-sm md:text-base ${
                   activeTab === 'cashin'
                     ? 'text-green-600 border-b-2 border-green-600'
                     : 'text-gray-600 hover:text-gray-800'
                 }`}
               >
-                <BanknotesIcon className="h-4 w-4 inline mr-2" />
+                <BanknotesIcon className="h-4 w-4 inline mr-1 md:mr-2" />
                 {t('agent.cashInService')}
               </button>
               <button
                 onClick={() => setActiveTab('history')}
-                className={`py-3 px-4 font-medium transition-colors whitespace-nowrap ${
+                className={`py-3 px-3 md:px-4 font-medium transition-colors whitespace-nowrap text-sm md:text-base ${
                   activeTab === 'history'
                     ? 'text-green-600 border-b-2 border-green-600'
                     : 'text-gray-600 hover:text-gray-800'
                 }`}
               >
-                <ArrowPathIcon className="h-4 w-4 inline mr-2" />
+                <ArrowPathIcon className="h-4 w-4 inline mr-1 md:mr-2" />
                 {t('agent.transactionHistory')}
               </button>
               <button
                 onClick={() => setActiveTab('customers')}
-                className={`py-3 px-4 font-medium transition-colors whitespace-nowrap ${
+                className={`py-3 px-3 md:px-4 font-medium transition-colors whitespace-nowrap text-sm md:text-base ${
                   activeTab === 'customers'
                     ? 'text-green-600 border-b-2 border-green-600'
                     : 'text-gray-600 hover:text-gray-800'
                 }`}
               >
-                <UsersIcon className="h-4 w-4 inline mr-2" />
+                <UsersIcon className="h-4 w-4 inline mr-1 md:mr-2" />
                 {t('agent.myCustomers')}
               </button>
               <button
                 onClick={() => setActiveTab('activities')}
-                className={`py-3 px-4 font-medium transition-colors whitespace-nowrap ${
+                className={`py-3 px-3 md:px-4 font-medium transition-colors whitespace-nowrap text-sm md:text-base ${
                   activeTab === 'activities'
                     ? 'text-green-600 border-b-2 border-green-600'
                     : 'text-gray-600 hover:text-gray-800'
                 }`}
               >
-                <ClockIcon className="h-4 w-4 inline mr-2" />
+                <ClockIcon className="h-4 w-4 inline mr-1 md:mr-2" />
                 {t('agent.recentActivities')}
               </button>
             </div>
           </div>
 
-          <div className="p-6">
+          <div className="p-4 md:p-6">
             {activeTab === 'cashin' && <CashInForm />}
             {activeTab === 'history' && <TransactionHistory />}
             {activeTab === 'customers' && (
@@ -221,9 +221,9 @@ export default function AgentDashboard() {
                   <div className="text-center py-8 text-gray-500">{t('agent.noRecentActivities')}</div>
                 ) : (
                   recentTransactions.map((tx: any) => (
-                    <div key={tx.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div>
-                        <p className="font-medium text-gray-800">
+                    <div key={tx.id} className="flex items-center justify-between p-3 md:p-4 border rounded-lg">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm md:text-base font-medium text-gray-800 truncate">
                           {tx.transaction_type === 'CASH_IN' ? t('transaction.cashIn') : tx.transaction_type} - {tx.receiver_phone || tx.sender_phone || ''}
                         </p>
                         <p className="text-sm text-gray-500">

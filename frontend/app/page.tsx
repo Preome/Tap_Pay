@@ -115,59 +115,64 @@ export default function LoginPage() {
 
   const UserTypeButton = ({ type, label, icon: Icon, color }: any) => (
     <button type="button" onClick={() => setUserType(type)}
-      className={`flex-1 py-3 px-4 rounded-lg transition-all ${userType === type ? `${color} text-white shadow-lg transform scale-105` : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+      className={`flex-1 py-3 md:py-3.5 px-2 md:px-4 rounded-lg transition-all text-xs md:text-sm ${
+        userType === type ? `${color} text-white shadow-lg transform scale-105` : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
       <Icon className={`h-5 w-5 mx-auto mb-1 ${userType === type ? 'text-white' : 'text-gray-600'}`} />
-      <span className="text-sm font-medium">{label}</span>
+      <span className="font-medium">{label}</span>
     </button>
   );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
       <div className="bg-blue-600 text-white shadow-lg">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <h1 className="text-2xl font-bold">{t('app.name')}</h1>
-            </div>
-            <div className="flex items-center space-x-3">
+        <div className="container mx-auto px-4 py-4 md:py-6">
+          <div className="flex items-center justify-between gap-2">
+            <h1 className="text-xl md:text-2xl font-bold">{t('app.name')}</h1>
+            <div className="flex items-center gap-2 md:gap-3">
               <LanguageSwitcher />
-              <div className="text-sm">
-                {isLogin ? t('auth.newUser') : t('auth.alreadyHaveAccount')}
-                <button onClick={() => setIsLogin(!isLogin)} className="ml-2 text-yellow-300 hover:text-yellow-200 font-semibold">
+              <div className="hidden sm:flex items-center text-xs md:text-sm">
+                <span className="whitespace-nowrap">{isLogin ? t('auth.newUser') : t('auth.alreadyHaveAccount')}</span>
+                <button onClick={() => setIsLogin(!isLogin)} className="ml-1 md:ml-2 text-yellow-300 hover:text-yellow-200 font-semibold whitespace-nowrap">
                   {isLogin ? t('auth.createAccount') : t('auth.login')}
                 </button>
               </div>
+              <button 
+                onClick={() => setIsLogin(!isLogin)} 
+                className="sm:hidden text-yellow-300 hover:text-yellow-200 text-xs font-semibold px-2 py-1 border border-yellow-300 rounded"
+              >
+                {isLogin ? t('auth.createAccount') : t('auth.login')}
+              </button>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-md mx-auto">
-          <div className="text-center mb-8">
-            <div className="bg-blue-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <PhoneIcon className="h-10 w-10 text-blue-600" />
+      <div className="container mx-auto px-4 py-8 md:py-12">
+        <div className="w-full max-w-md mx-auto">
+          <div className="text-center mb-6 md:mb-8">
+            <div className="bg-blue-100 w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+              <PhoneIcon className="h-8 w-8 md:h-10 md:w-10 text-blue-600" />
             </div>
-            <h2 className="text-3xl font-bold text-gray-800">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
               {isLogin ? t('auth.welcomeBack') : t('auth.createAccount')}
             </h2>
-            <p className="text-gray-600 mt-2">
+            <p className="text-sm md:text-base text-gray-600 mt-1 md:mt-2">
               {isLogin ? t('auth.loginToAccess') : t('auth.joinNow')}
             </p>
           </div>
 
           {isLogin ? (
-            <form onSubmit={handleLogin} className="bg-white rounded-2xl shadow-xl p-8">
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-3">{t('auth.loginAs')}</label>
-                <div className="flex gap-3">
+            <form onSubmit={handleLogin} className="bg-white rounded-2xl shadow-xl p-4 md:p-8">
+              <div className="mb-4 md:mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2 md:mb-3">{t('auth.loginAs')}</label>
+                <div className="flex gap-2 md:gap-3">
                   <UserTypeButton type="USER" label={t('auth.userType_user')} icon={UserIcon} color="bg-blue-600" />
                   <UserTypeButton type="MERCHANT" label={t('auth.userType_merchant')} icon={BuildingStorefrontIcon} color="bg-purple-600" />
                   <UserTypeButton type="AGENT" label={t('auth.userType_agent')} icon={BriefcaseIcon} color="bg-green-600" />
                 </div>
               </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t('auth.phoneNumber')}</label>
+              <div className="mb-3 md:mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1 md:mb-2">{t('auth.phoneNumber')}</label>
                 <div className="relative">
                   <PhoneIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <input type="tel" required value={loginData.phone} onChange={(e) => setLoginData({...loginData, phone: e.target.value})}
@@ -175,31 +180,32 @@ export default function LoginPage() {
                     placeholder="01XXXXXXXXX" />
                 </div>
               </div>
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t('auth.pinNumber')}</label>
+              <div className="mb-4 md:mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-1 md:mb-2">{t('auth.pinNumber')}</label>
                 <input type="password" required maxLength={4} value={loginData.pin} onChange={(e) => setLoginData({...loginData, pin: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="****" />
               </div>
               <button type="submit" disabled={loading}
-                className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 font-semibold">
+                className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 font-semibold text-sm md:text-base">
                 {loading ? t('auth.loggingIn') : t('auth.login')}
               </button>
             </form>
           ) : (
-            <form onSubmit={handleSignup} className="bg-white rounded-2xl shadow-xl p-8">
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-3">{t('auth.loginAs')}</label>
-                <div className="grid grid-cols-3 gap-3">
+            <form onSubmit={handleSignup} className="bg-white rounded-2xl shadow-xl p-4 md:p-8">
+              <div className="mb-4 md:mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2 md:mb-3">{t('auth.loginAs')}</label>
+                <div className="grid grid-cols-3 gap-2 md:gap-3">
                   {[
                     { type: 'USER', label: t('auth.userType_user'), icon: UserIcon, color: 'blue' },
                     { type: 'MERCHANT', label: t('auth.userType_merchant'), icon: BuildingStorefrontIcon, color: 'purple' },
                     { type: 'AGENT', label: t('auth.userType_agent'), icon: BriefcaseIcon, color: 'green' },
                   ].map((item) => (
                     <button key={item.type} type="button" onClick={() => setSignupData({...signupData, userType: item.type})}
-                      className={`py-3 px-4 rounded-lg transition-all ${signupData.userType === item.type ? `bg-${item.color}-600 text-white shadow-lg` : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+                      className={`py-3 px-2 md:px-4 rounded-lg transition-all text-xs md:text-sm ${
+                        signupData.userType === item.type ? `bg-${item.color}-600 text-white shadow-lg` : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
                       <item.icon className={`h-5 w-5 mx-auto mb-1 ${signupData.userType === item.type ? 'text-white' : 'text-gray-600'}`} />
-                      <span className="text-sm">{item.label}</span>
+                      <span className="font-medium">{item.label}</span>
                     </button>
                   ))}
                 </div>
