@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { PaperAirplaneIcon } from '@heroicons/react/24/outline';
+import { transactionAPI } from '@/services/api';
 
 interface SendMoneyFormData {
   receiver_phone: string;
@@ -11,19 +12,27 @@ interface SendMoneyFormData {
   pin: string;
 }
 
-export default function SendMoneyForm() {
+interface SendMoneyFormProps {
+  onSuccess?: () => void;
+}
+
+export default function SendMoneyForm({ onSuccess }: SendMoneyFormProps) {
   const [loading, setLoading] = useState(false);
   const { register, handleSubmit, reset, formState: { errors } } = useForm<SendMoneyFormData>();
   
   const onSubmit = async (data: SendMoneyFormData) => {
     setLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      console.log('Send Money:', data);
+      await transactionAPI.sendMoney({
+        receiver_phone: data.receiver_phone,
+        amount: data.amount,
+      });
       toast.success(`Successfully sent ${data.amount} BDT to ${data.receiver_phone}`);
       reset();
-    } catch (error) {
-      toast.error('Failed to send money. Please try again.');
+      onSuccess?.();
+    } catch (error: any) {
+      const msg = error?.response?.data?.error || 'Failed to send money. Please try again.';
+      toast.error(msg);
     } finally {
       setLoading(false);
     }

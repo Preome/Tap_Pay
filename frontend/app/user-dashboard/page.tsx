@@ -14,6 +14,7 @@ export default function UserDashboard() {
   const [user, setUser] = useState<any>(null);
   const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<string | null>(null);
   const [stats, setStats] = useState({ totalSent: 0, totalReceived: 0, transactionCount: 0 });
 
   useEffect(() => {
@@ -59,10 +60,10 @@ export default function UserDashboard() {
   };
 
   const quickActions = [
-    { icon: ArrowUpIcon, label: 'Send Money', color: 'bg-blue-500', action: 'send' },
-    { icon: ArrowDownIcon, label: 'Cash In', color: 'bg-green-500', action: 'cashin' },
-    { icon: CreditCardIcon, label: 'Pay Merchant', color: 'bg-purple-500', action: 'merchant' },
-    { icon: ArrowPathIcon, label: 'Transactions', color: 'bg-orange-500', action: 'history' },
+    { icon: ArrowUpIcon, label: 'Send Money', color: 'bg-blue-500', tab: 'send' },
+    { icon: ArrowDownIcon, label: 'Cash In', color: 'bg-green-500', tab: 'cashin' },
+    { icon: CreditCardIcon, label: 'Pay Merchant', color: 'bg-purple-500', tab: 'merchant' },
+    { icon: ArrowPathIcon, label: 'Transactions', color: 'bg-orange-500', tab: 'history' },
   ];
 
   if (loading) {
@@ -90,6 +91,7 @@ export default function UserDashboard() {
             {quickActions.map((action, index) => (
               <button
                 key={index}
+                onClick={() => setActiveTab(action.tab)}
                 className="bg-white rounded-xl p-4 text-center hover:shadow-lg transition-shadow"
               >
                 <div className={`${action.color} w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2`}>
@@ -101,32 +103,50 @@ export default function UserDashboard() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-1 space-y-6">
-            <BalanceCard balance={balance} />
-            <div className="bg-white rounded-xl p-4">
-              <h3 className="font-semibold text-gray-800 mb-3">Quick Stats</h3>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Total Sent:</span>
-                  <span className="font-semibold">৳ {stats.totalSent.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Total Received:</span>
-                  <span className="font-semibold">৳ {stats.totalReceived.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Transactions:</span>
-                  <span className="font-semibold">{stats.transactionCount}</span>
+        {activeTab === 'send' && (
+          <SendMoneyForm onSuccess={() => { fetchDashboardData(); setActiveTab(null); }} />
+        )}
+
+        {activeTab === 'cashin' && (
+          <div className="bg-white rounded-xl p-6 text-center">
+            <p className="text-gray-500">Visit an agent to cash in.</p>
+          </div>
+        )}
+
+        {activeTab === 'merchant' && (
+          <div className="bg-white rounded-xl p-6 text-center">
+            <p className="text-gray-500">Merchant payment coming soon.</p>
+          </div>
+        )}
+
+        {activeTab !== 'send' && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-1 space-y-6">
+              <BalanceCard balance={balance} />
+              <div className="bg-white rounded-xl p-4">
+                <h3 className="font-semibold text-gray-800 mb-3">Quick Stats</h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Total Sent:</span>
+                    <span className="font-semibold">৳ {stats.totalSent.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Total Received:</span>
+                    <span className="font-semibold">৳ {stats.totalReceived.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Transactions:</span>
+                    <span className="font-semibold">{stats.transactionCount}</span>
+                  </div>
                 </div>
               </div>
             </div>
+            
+            <div className="lg:col-span-2">
+              <TransactionHistory />
+            </div>
           </div>
-          
-          <div className="lg:col-span-2">
-            <TransactionHistory />
-          </div>
-        </div>
+        )}
       </div>
     </DashboardLayout>
   );
