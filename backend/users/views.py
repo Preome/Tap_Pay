@@ -10,6 +10,7 @@ from transactions.serializers import TransactionSerializer, TransactionListSeria
 from wallets.models import Wallet
 from django.db import transaction as db_transaction
 from django.contrib.auth import get_user_model
+from decimal import Decimal
 
 User = get_user_model()
 
@@ -42,7 +43,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
 
         queryset = Transaction.objects.filter(
-            Q(sender=self.request.user) | Q(receiver=self.request.user)
+            Q(sender=self.request.user) | Q(receiver=self.request.user) | Q(agent=self.request.user)
         ).select_related(
             'sender',
             'receiver',
@@ -101,9 +102,12 @@ class TransactionViewSet(viewsets.ModelViewSet):
 
         try:
             from users.models import User
-            receiver = User.objects.select_related('wallet').get(phone_number=receiver_phone)
+            receiver = User.objects.get(phone_number=receiver_phone)
 
             with db_transaction.atomic():
+                agent_wallet = Wallet.objects.select_for_update().get(user=user)
+                if agent_wallet.balance < amount:
+                    return Response({'error': 'Insufficient balance'}, status=status.HTTP_400_BAD_REQUEST)
 
                 transaction = Transaction.objects.create(
                     transaction_id=f"CI{timezone.now().strftime('%Y%m%d%H%M%S')}{user.id}",
@@ -114,6 +118,8 @@ class TransactionViewSet(viewsets.ModelViewSet):
                     status='COMPLETED'
                 )
 
+                agent_wallet.balance = F('balance') - amount
+                agent_wallet.save(update_fields=['balance'])
                 Wallet.objects.filter(user=receiver).update(balance=F('balance') + amount)
 
                 return Response(TransactionSerializer(transaction).data, status=status.HTTP_201_CREATED)

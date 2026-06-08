@@ -13,6 +13,7 @@ import {
 } from '@heroicons/react/24/outline';
 import CashInForm from '@/components/Transactions/CashInForm';
 import TransactionHistory from '@/components/Transactions/TransactionHistory';
+import { authAPI, transactionAPI } from '@/services/api';
 import toast from 'react-hot-toast';
 
 export default function AgentDashboard() {
@@ -20,55 +21,73 @@ export default function AgentDashboard() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('cashin');
+  const [balance, setBalance] = useState(0);
+  const [stats, setStats] = useState({
+    cashInTotal: 0,
+    cashOutTotal: 0,
+    customersServed: 0,
+    commission: 0,
+  });
+  const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
 
   useEffect(() => {
-    console.log('Agent Dashboard - Component mounted');
-    console.log('Checking localStorage...');
-    
     const userData = localStorage.getItem('user');
-    console.log('Raw user data from localStorage:', userData);
-    
     if (!userData) {
-      console.log('No user data found, redirecting to login...');
       router.push('/');
       return;
     }
     
     try {
       const parsedUser = JSON.parse(userData);
-      console.log('Parsed user data:', parsedUser);
-      console.log('User type:', parsedUser.userType);
       
       if ((parsedUser.user_type || parsedUser.userType) !== 'AGENT') {
-        console.error('User is not an agent! User type:', parsedUser.user_type);
         toast.error('Access denied. Agent only area.');
         router.push('/');
         return;
       }
       
       setUser(parsedUser);
-      console.log('Agent dashboard loaded successfully for:', parsedUser.name);
+      fetchDashboardData();
     } catch (error) {
-      console.error('Error parsing user data:', error);
       localStorage.removeItem('user');
       router.push('/');
-    } finally {
-      setLoading(false);
     }
   }, [router]);
 
-  const stats = [
-    { label: "Today's Cash In", value: '৳ 1,25,000', icon: BanknotesIcon, change: '+23%', color: 'bg-green-500' },
-    { label: "Today's Cash Out", value: '৳ 85,000', icon: ArrowTrendingUpIcon, change: '+12%', color: 'bg-red-500' },
-    { label: 'Customers Served', value: '156', icon: UsersIcon, change: '+34%', color: 'bg-blue-500' },
-    { label: 'Commission Earned', value: '৳ 2,450', icon: UserPlusIcon, change: '+18%', color: 'bg-purple-500' },
-  ];
+  const fetchDashboardData = async () => {
+    try {
+      const [profileRes, summaryRes, txRes] = await Promise.all([
+        authAPI.getProfile(),
+        transactionAPI.getSummary().catch(() => null),
+        transactionAPI.getTransactions({ page_size: 5 }),
+      ]);
 
-  const recentActivities = [
-    { id: 1, type: 'Cash In', customer: '01712345678', amount: 5000, time: '2 min ago', status: 'Completed' },
-    { id: 2, type: 'Cash Out', customer: '01812345678', amount: 2000, time: '15 min ago', status: 'Completed' },
-    { id: 3, type: 'Cash In', customer: '01912345678', amount: 10000, time: '1 hour ago', status: 'Completed' },
-    { id: 4, type: 'Cash In', customer: '01612345678', amount: 3000, time: '2 hours ago', status: 'Pending' },
+      const userData = profileRes.data;
+      setBalance(userData.balance || 0);
+
+      if (summaryRes?.data) {
+        setStats({
+          cashInTotal: summaryRes.data.total_sent || 0,
+          cashOutTotal: summaryRes.data.total_received || 0,
+          customersServed: summaryRes.data.transaction_count || 0,
+          commission: 0,
+        });
+      }
+
+      const txs = txRes.data.results || txRes.data || [];
+      setRecentTransactions(txs);
+    } catch (error) {
+      console.error('Failed to load dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const dashboardStats = [
+    { label: "Today's Cash In", value: `৳ ${stats.cashInTotal.toLocaleString()}`, icon: BanknotesIcon, change: '', color: 'bg-green-500' },
+    { label: "Today's Cash Out", value: `৳ ${stats.cashOutTotal.toLocaleString()}`, icon: ArrowTrendingUpIcon, change: '', color: 'bg-red-500' },
+    { label: 'Customers Served', value: stats.customersServed.toString(), icon: UsersIcon, change: '', color: 'bg-blue-500' },
+    { label: 'Commission Earned', value: `৳ ${stats.commission.toLocaleString()}`, icon: UserPlusIcon, change: '', color: 'bg-purple-500' },
   ];
 
   if (loading) {
@@ -112,26 +131,22 @@ export default function AgentDashboard() {
           <div className="mt-4 grid grid-cols-2 gap-4">
             <div className="bg-white bg-opacity-20 rounded-lg px-4 py-3">
               <p className="text-sm opacity-90">Agent Balance</p>
-              <p className="text-2xl font-bold">৳ 1,25,890</p>
+              <p className="text-2xl font-bold">৳ {balance.toLocaleString()}</p>
             </div>
             <div className="bg-white bg-opacity-20 rounded-lg px-4 py-3">
               <p className="text-sm opacity-90">Today's Commission</p>
-              <p className="text-2xl font-bold">৳ 2,450</p>
+              <p className="text-2xl font-bold">৳ {stats.commission.toLocaleString()}</p>
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {stats.map((stat, index) => (
+          {dashboardStats.map((stat, index) => (
             <div key={index} className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between mb-4">
                 <div className={`${stat.color} p-3 rounded-lg`}>
                   <stat.icon className="h-6 w-6 text-white" />
                 </div>
-                <span className="text-green-600 text-sm font-semibold flex items-center">
-                  <ArrowTrendingUpIcon className="h-3 w-3 mr-1" />
-                  {stat.change}
-                </span>
               </div>
               <h3 className="text-2xl font-bold text-gray-800">{stat.value}</h3>
               <p className="text-gray-600 text-sm mt-1">{stat.label}</p>
@@ -203,24 +218,32 @@ export default function AgentDashboard() {
             )}
             {activeTab === 'activities' && (
               <div className="space-y-3">
-                {recentActivities.map((activity) => (
-                  <div key={activity.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <p className="font-medium text-gray-800">
-                        {activity.type} - {activity.customer}
-                      </p>
-                      <p className="text-sm text-gray-500">{activity.time}</p>
+                {recentTransactions.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">No recent activities</div>
+                ) : (
+                  recentTransactions.map((tx: any) => (
+                    <div key={tx.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div>
+                        <p className="font-medium text-gray-800">
+                          {tx.transaction_type === 'CASH_IN' ? 'Cash In' : tx.transaction_type} - {tx.receiver_phone || tx.sender_phone || ''}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          {new Date(tx.created_at).toLocaleString('en-US', {
+                            month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                          })}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-green-600">+ ৳ {Number(tx.amount).toLocaleString()}</p>
+                        <p className={`text-xs ${
+                          tx.status === 'COMPLETED' ? 'text-green-600' : 'text-yellow-600'
+                        }`}>
+                          {tx.status}
+                        </p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-bold text-green-600">+ ৳ {activity.amount.toLocaleString()}</p>
-                      <p className={`text-xs ${
-                        activity.status === 'Completed' ? 'text-green-600' : 'text-yellow-600'
-                      }`}>
-                        {activity.status}
-                      </p>
-                    </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             )}
           </div>

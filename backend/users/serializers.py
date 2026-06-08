@@ -26,6 +26,14 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return user
 
 class UserSerializer(serializers.ModelSerializer):
+    balance = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = '__all__'
+
+    def get_balance(self, obj):
+        try:
+            return float(obj.wallet.balance)
+        except:
+            return 0.0

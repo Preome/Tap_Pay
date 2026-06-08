@@ -4,10 +4,20 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/Layout/DashboardLayout';
 import { QrCodeIcon, CurrencyBangladeshiIcon, ChartBarIcon, UserGroupIcon } from '@heroicons/react/24/outline';
+import { authAPI, transactionAPI } from '@/services/api';
 
 export default function MerchantDashboard() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
+  const [balance, setBalance] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    salesTotal: 0,
+    customerCount: 0,
+    revenueTotal: 0,
+    qrScans: 0,
+  });
+  const [recentPayments, setRecentPayments] = useState<any[]>([]);
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
@@ -15,21 +25,62 @@ export default function MerchantDashboard() {
       router.push('/');
       return;
     }
-    setUser(JSON.parse(userData));
+    
+    try {
+      const parsedUser = JSON.parse(userData);
+      setUser(parsedUser);
+      fetchDashboardData();
+    } catch (error) {
+      localStorage.removeItem('user');
+      router.push('/');
+    }
   }, [router]);
 
-  const stats = [
-    { label: 'Today\'s Sales', value: '৳ 12,450', icon: CurrencyBangladeshiIcon, change: '+15%', color: 'bg-green-500' },
-    { label: 'Total Customers', value: '1,234', icon: UserGroupIcon, change: '+23%', color: 'bg-blue-500' },
-    { label: 'Total Revenue', value: '৳ 2,45,890', icon: ChartBarIcon, change: '+32%', color: 'bg-purple-500' },
-    { label: 'QR Scans', value: '456', icon: QrCodeIcon, change: '+12%', color: 'bg-orange-500' },
+  const fetchDashboardData = async () => {
+    try {
+      const [profileRes, summaryRes, txRes] = await Promise.all([
+        authAPI.getProfile(),
+        transactionAPI.getSummary().catch(() => null),
+        transactionAPI.getTransactions({ page_size: 5 }),
+      ]);
+
+      const userData = profileRes.data;
+      setBalance(userData.balance || 0);
+
+      if (summaryRes?.data) {
+        setStats(prev => ({
+          ...prev,
+          revenueTotal: summaryRes.data.total_received || 0,
+          customerCount: summaryRes.data.transaction_count || 0,
+        }));
+      }
+
+      const txs = txRes.data.results || txRes.data || [];
+      setRecentPayments(txs);
+    } catch (error) {
+      console.error('Failed to load dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const dashboardStats = [
+    { label: 'Today\'s Sales', value: `৳ ${stats.salesTotal.toLocaleString()}`, icon: CurrencyBangladeshiIcon, change: '', color: 'bg-green-500' },
+    { label: 'Total Customers', value: stats.customerCount.toString(), icon: UserGroupIcon, change: '', color: 'bg-blue-500' },
+    { label: 'Total Revenue', value: `৳ ${stats.revenueTotal.toLocaleString()}`, icon: ChartBarIcon, change: '', color: 'bg-purple-500' },
+    { label: 'QR Scans', value: stats.qrScans.toString(), icon: QrCodeIcon, change: '', color: 'bg-orange-500' },
   ];
 
-  const recentPayments = [
-    { id: 1, customer: '01712345678', amount: 450, time: '2 min ago', status: 'Success' },
-    { id: 2, customer: '01812345678', amount: 1200, time: '15 min ago', status: 'Success' },
-    { id: 3, customer: '01912345678', amount: 250, time: '1 hour ago', status: 'Success' },
-  ];
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -40,23 +91,22 @@ export default function MerchantDashboard() {
           <div className="mt-4 flex items-center space-x-4">
             <div className="bg-white bg-opacity-20 rounded-lg px-4 py-2">
               <p className="text-sm">Wallet Balance</p>
-              <p className="text-xl font-bold">৳ 45,890</p>
+              <p className="text-xl font-bold">৳ {balance.toLocaleString()}</p>
             </div>
             <div className="bg-white bg-opacity-20 rounded-lg px-4 py-2">
               <p className="text-sm">Today's Earnings</p>
-              <p className="text-xl font-bold">৳ 12,450</p>
+              <p className="text-xl font-bold">৳ {stats.salesTotal.toLocaleString()}</p>
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {stats.map((stat, index) => (
+          {dashboardStats.map((stat, index) => (
             <div key={index} className="bg-white rounded-xl p-6 shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <div className={`${stat.color} p-3 rounded-lg`}>
                   <stat.icon className="h-6 w-6 text-white" />
                 </div>
-                <span className="text-green-600 text-sm font-semibold">{stat.change}</span>
               </div>
               <h3 className="text-2xl font-bold text-gray-800">{stat.value}</h3>
               <p className="text-gray-600 text-sm mt-1">{stat.label}</p>
@@ -84,18 +134,26 @@ export default function MerchantDashboard() {
         <div className="bg-white rounded-xl p-6">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">Recent Payments</h2>
           <div className="space-y-3">
-            {recentPayments.map((payment) => (
-              <div key={payment.id} className="flex items-center justify-between p-4 border rounded-lg">
-                <div>
-                  <p className="font-medium text-gray-800">Payment from {payment.customer}</p>
-                  <p className="text-sm text-gray-500">{payment.time}</p>
+            {recentPayments.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">No recent payments</div>
+            ) : (
+              recentPayments.map((payment: any) => (
+                <div key={payment.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div>
+                    <p className="font-medium text-gray-800">Payment from {payment.sender_phone || payment.sender}</p>
+                    <p className="text-sm text-gray-500">
+                      {new Date(payment.created_at).toLocaleString('en-US', {
+                        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                      })}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-bold text-green-600">+ ৳ {Number(payment.amount).toLocaleString()}</p>
+                    <p className="text-xs text-green-600">{payment.status}</p>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="font-bold text-green-600">+ ৳ {payment.amount}</p>
-                  <p className="text-xs text-green-600">{payment.status}</p>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </div>

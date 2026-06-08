@@ -29,10 +29,10 @@ export const authAPI = {
 };
 
 export const transactionAPI = {
+  cashIn: (data: { receiver_phone: string; amount: number }) => 
+    api.post('/api/v1/transactions/cash_in/', data),
   sendMoney: (data: any) => 
     api.post('/api/v1/transactions/send_money/', data),
-  cashIn: (data: any) => 
-    api.post('/api/v1/transactions/cash_in/', data),
   merchantPayment: (data: any) => 
     api.post('/api/v1/transactions/merchant_payment/', data),
   getTransactions: (params?: any) => 

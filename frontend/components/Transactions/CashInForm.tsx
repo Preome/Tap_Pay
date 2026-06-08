@@ -4,9 +4,10 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
+import { transactionAPI } from '@/services/api';
 
 interface CashInFormData {
-  agent_phone: string;
+  receiver_phone: string;
   amount: number;
 }
 
@@ -17,12 +18,15 @@ export default function CashInForm() {
   const onSubmit = async (data: CashInFormData) => {
     setLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      console.log('Cash In:', data);
+      const response = await transactionAPI.cashIn({
+        receiver_phone: data.receiver_phone,
+        amount: data.amount,
+      });
       toast.success(`Successfully cashed in ${data.amount} BDT`);
       reset();
-    } catch (error) {
-      toast.error('Cash in failed. Please try again.');
+    } catch (error: any) {
+      const msg = error?.response?.data?.error || 'Cash in failed. Please try again.';
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -38,11 +42,11 @@ export default function CashInForm() {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Agent Phone Number *
+            User Phone Number *
           </label>
           <input
-            {...register('agent_phone', { 
-              required: 'Agent phone number is required',
+            {...register('receiver_phone', { 
+              required: 'Phone number is required',
               pattern: {
                 value: /^01[3-9]\d{8}$/,
                 message: 'Enter a valid Bangladesh phone number'
@@ -52,8 +56,8 @@ export default function CashInForm() {
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             placeholder="01XXXXXXXXX"
           />
-          {errors.agent_phone && (
-            <p className="mt-1 text-sm text-red-600">{errors.agent_phone.message}</p>
+          {errors.receiver_phone && (
+            <p className="mt-1 text-sm text-red-600">{errors.receiver_phone.message}</p>
           )}
         </div>
         
