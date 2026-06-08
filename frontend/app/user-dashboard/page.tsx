@@ -121,10 +121,13 @@ export default function UserDashboard() {
         )}
 
         {activeTab !== 'send' && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-            <div className="lg:col-span-1 space-y-4 md:space-y-6">
+          <div className="w-full">
+            <div className="max-w-6xl mx-auto space-y-4 md:space-y-6 flex flex-col items-stretch">
+
+
               <BalanceCard balance={balance} />
-              <div className="bg-white rounded-xl p-3 md:p-4">
+              <div className="bg-white rounded-xl p-3 md:p-4 w-full">
+
                 <h3 className="font-semibold text-gray-800 mb-2 md:mb-3 text-sm md:text-base">{t('user.quickStats')}</h3>
                 <div className="space-y-1.5 md:space-y-2">
                   <div className="flex justify-between text-xs md:text-sm">
