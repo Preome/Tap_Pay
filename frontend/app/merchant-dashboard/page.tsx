@@ -131,17 +131,38 @@ export default function MerchantDashboard() {
             <h2 className="text-xl font-semibold text-gray-800">
               {(merchantName || 'Merchant')} {t('merchant.qrCode')}
             </h2>
+            {qrImageUrl && (
+              <button
+                onClick={async () => {
+                  try {
+                    const res = await fetch(qrImageUrl);
+                    const svg = await res.text();
+                    const blob = new Blob([svg], { type: 'image/svg+xml' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${merchantCode || 'merchant'}-qr.svg`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                  } catch {}
+                }}
+                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm font-medium"
+              >
+                {t('merchant.downloadQR')}
+              </button>
+            )}
           </div>
-          <div className="flex items-center justify-center p-8 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-center p-8 bg-white rounded-lg border-2 border-dashed border-gray-200">
             <div className="text-center">
               {qrImageUrl ? (
                 <img
                   src={qrImageUrl}
                   alt={`QR Code for ${merchantName}`}
-                  className="w-48 h-48 mx-auto"
+                  className="w-64 h-64 mx-auto"
+                  style={{ imageRendering: 'pixelated' }}
                 />
               ) : (
-                <div className="w-48 h-48 bg-gray-200 rounded-lg flex items-center justify-center mx-auto">
+                <div className="w-64 h-64 bg-gray-100 rounded-lg flex items-center justify-center mx-auto">
                   <QrCodeIcon className="h-32 w-32 text-gray-400" />
                 </div>
               )}
@@ -149,7 +170,7 @@ export default function MerchantDashboard() {
                 {t('merchant.scanToPay')} @ {merchantName || user?.username || 'Your Store'}
               </p>
               {merchantCode && (
-                <p className="mt-1 text-sm text-gray-400">
+                <p className="mt-1 text-sm text-gray-400 font-mono">
                   {t('merchant.code')}: {merchantCode}
                 </p>
               )}

@@ -33,18 +33,32 @@ class MerchantViewSet(viewsets.ReadOnlyModelViewSet):
 
         qr_data = f"TAPPAY:MERCHANT:{merchant.registration_number}:{merchant.business_name}"
 
-        qr = qrcode.QRCode(version=1, box_size=10, border=4)
+        qr = qrcode.QRCode(version=2, box_size=12, border=2)
         qr.add_data(qr_data)
         qr.make(fit=True)
 
-        from qrcode.image.svg import SvgPathImage
-        img = qr.make_image(image_factory=SvgPathImage)
+        matrix = qr.modules
+        n = len(matrix)
+        box = 12
+        border_boxes = 2
+        size = (n + 2 * border_boxes) * box
 
-        buffer = io.BytesIO()
-        img.save(buffer)
-        buffer.seek(0)
+        rects = [f'<rect width="{size}" height="{size}" fill="white"/>']
+        for r in range(n):
+            for c in range(n):
+                if matrix[r][c]:
+                    x = (c + border_boxes) * box
+                    y = (r + border_boxes) * box
+                    rects.append(f'<rect x="{x}" y="{y}" width="{box}" height="{box}" fill="black"/>')
 
-        return HttpResponse(buffer.getvalue(), content_type='image/svg+xml')
+        svg = (
+            f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {size} {size}" '
+            f'width="{size}" height="{size}">'
+            f'{"".join(rects)}'
+            f'</svg>'
+        )
+
+        return HttpResponse(svg, content_type='image/svg+xml')
 
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def my_merchant(self, request):
