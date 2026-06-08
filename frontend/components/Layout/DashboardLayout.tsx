@@ -30,18 +30,19 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   };
 
   const primaryNav = [
-    { name: t('nav.dashboard'), icon: HomeIcon, href: '#' },
-    { name: t('nav.transactions'), icon: ArrowPathIcon, href: '#' },
-    { name: t('nav.wallet'), icon: WalletIcon, href: '#' },
-    { name: t('nav.profile'), icon: UserIcon, href: '#' },
+    { name: t('nav.dashboard'), icon: HomeIcon, href: '/user-dashboard' },
+    { name: t('nav.transactions'), icon: ArrowPathIcon, href: '/user-dashboard/transactions' },
+    { name: t('nav.wallet'), icon: WalletIcon, href: '/user-dashboard' },
+    { name: t('nav.profile'), icon: UserIcon, href: '/' },
   ];
 
   const bottomNav = [
-    { name: t('nav.dashboard'), icon: HomeIcon, href: '#' },
-    { name: t('nav.transactions'), icon: ArrowPathIcon, href: '#' },
-    { name: t('nav.wallet'), icon: WalletIcon, href: '#' },
-    { name: t('nav.profile'), icon: UserIcon, href: '#' },
+    { name: t('nav.dashboard'), icon: HomeIcon, href: '/user-dashboard' },
+    { name: t('nav.transactions'), icon: ArrowPathIcon, href: '/user-dashboard/transactions' },
+    { name: t('nav.wallet'), icon: WalletIcon, href: '/user-dashboard' },
+    { name: t('nav.profile'), icon: UserIcon, href: '/' },
   ];
+
 
   return (
     <div className="min-h-screen bg-gray-50 pb-16 md:pb-0">

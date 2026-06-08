@@ -6,7 +6,7 @@ import DashboardLayout from '@/components/Layout/DashboardLayout';
 import BalanceCard from '@/components/Wallet/BalanceCard';
 import SendMoneyForm from '@/components/Transactions/SendMoneyForm';
 import MerchantPaymentForm from '@/components/Transactions/MerchantPaymentForm';
-import TransactionHistory from '@/components/Transactions/TransactionHistory';
+
 import { ArrowPathIcon, ArrowUpIcon, ArrowDownIcon, CreditCardIcon } from '@heroicons/react/24/outline';
 import { useTranslation } from 'react-i18next';
 import { authAPI, transactionAPI } from '@/services/api';
@@ -143,9 +143,8 @@ export default function UserDashboard() {
               </div>
             </div>
             
-            <div className="lg:col-span-2">
-              <TransactionHistory />
-            </div>
+            {/* Transactions moved to /user-dashboard/transactions */}
+          
           </div>
         )}
       </div>

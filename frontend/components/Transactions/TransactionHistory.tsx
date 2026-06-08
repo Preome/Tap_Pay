@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { ArrowUpIcon, ArrowDownIcon, CreditCardIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 import { transactionAPI } from '@/services/api';
@@ -20,7 +21,12 @@ interface Transaction {
   agent_phone?: string;
 }
 
-export default function TransactionHistory() {
+type TransactionHistoryProps = {
+  mode?: 'dashboard' | 'page';
+};
+
+export default function TransactionHistory({ mode = 'dashboard' }: TransactionHistoryProps) {
+  const router = useRouter();
   const { t } = useTranslation();
   const [filter, setFilter] = useState('all');
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -104,9 +110,11 @@ export default function TransactionHistory() {
           </div>
         ) : (
           filteredTransactions.map((transaction) => (
-              <div
+              <button
+                type="button"
                 key={transaction.id}
-                className="flex items-center justify-between p-3 md:p-4 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors"
+                onClick={() => router.push(`/user-dashboard/transactions/${transaction.id}`)}
+                className="w-full text-left flex items-center justify-between p-3 md:p-4 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <div className="flex items-center space-x-2 md:space-x-3 min-w-0 flex-1">
                   <div className="p-1.5 md:p-2 bg-gray-100 rounded-full shrink-0">
@@ -145,7 +153,7 @@ export default function TransactionHistory() {
                      transaction.status}
                   </p>
                 </div>
-              </div>
+              </button>
           ))
         )}
       </div>

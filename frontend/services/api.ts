@@ -37,6 +37,8 @@ export const transactionAPI = {
     api.post('/api/v1/transactions/merchant_payment/', data),
   getTransactions: (params?: any) => 
     api.get('/api/v1/transactions/', { params }),
+  getTransactionById: (id: string | number) =>
+    api.get(`/api/v1/transactions/${id}/`),
   getSummary: () => 
     api.get('/api/v1/transactions/summary/'),
 };
