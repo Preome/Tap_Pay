@@ -47,11 +47,17 @@ export default function MerchantDashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      const [profileRes, statsRes, txRes, merchantRes] = await Promise.all([
+      const merchantRes = await merchantAPI.getMyMerchant().catch((e) => {
+        console.error('Failed to load merchant profile:', e);
+        return null;
+      });
+      const [profileRes, statsRes, txRes] = await Promise.all([
         authAPI.getProfile(),
-        merchantAPI.getStats().catch(() => null),
+        merchantAPI.getStats().catch((e) => {
+          console.error('Failed to load merchant stats:', e);
+          return null;
+        }),
         transactionAPI.getTransactions({ page_size: 5 }),
-        merchantAPI.getMyMerchant().catch(() => null),
       ]);
 
       const userData = profileRes.data;

@@ -82,7 +82,20 @@ class MerchantViewSet(viewsets.ReadOnlyModelViewSet):
     def stats(self, request):
         merchant = Merchant.objects.filter(user=request.user).first()
         if not merchant:
-            return Response({'error': 'Merchant profile not found'}, status=status.HTTP_404_NOT_FOUND)
+            if request.user.user_type == 'MERCHANT':
+                merchant = Merchant.objects.create(
+                    user=request.user,
+                    business_name=request.user.username,
+                    registration_number=f"REG-{request.user.id:06d}",
+                    is_verified=True
+                )
+            else:
+                return Response({
+                    'today_sales': 0,
+                    'total_customers': 0,
+                    'total_revenue': 0,
+                    'total_transactions': 0,
+                })
 
         today = timezone.now().date()
 
@@ -93,11 +106,11 @@ class MerchantViewSet(viewsets.ReadOnlyModelViewSet):
 
         today_txns = all_txns.filter(created_at__date=today)
 
-        stats = {
+        data = {
             'today_sales': today_txns.aggregate(total=Sum('amount'))['total'] or 0,
             'total_customers': all_txns.values('sender').distinct().count(),
             'total_revenue': all_txns.aggregate(total=Sum('amount'))['total'] or 0,
             'total_transactions': all_txns.count(),
         }
 
-        return Response(stats)
+        return Response(data)
