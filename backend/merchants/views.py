@@ -1,6 +1,8 @@
 import io
 import qrcode
 from django.http import HttpResponse
+from django.utils import timezone
+from django.db.models import Sum, Count
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -8,6 +10,7 @@ from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from merchants.models import Merchant
 from merchants.serializers import MerchantSerializer, MerchantPublicSerializer
+from transactions.models import Transaction
 
 class MerchantViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Merchant.objects.all()
@@ -74,3 +77,27 @@ class MerchantViewSet(viewsets.ReadOnlyModelViewSet):
             )
             return Response(MerchantSerializer(merchant).data, status=status.HTTP_201_CREATED)
         return Response({'error': 'Merchant profile not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def stats(self, request):
+        merchant = Merchant.objects.filter(user=request.user).first()
+        if not merchant:
+            return Response({'error': 'Merchant profile not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        today = timezone.now().date()
+
+        all_txns = Transaction.objects.filter(
+            merchant=merchant,
+            status='COMPLETED'
+        )
+
+        today_txns = all_txns.filter(created_at__date=today)
+
+        stats = {
+            'today_sales': today_txns.aggregate(total=Sum('amount'))['total'] or 0,
+            'total_customers': all_txns.values('sender').distinct().count(),
+            'total_revenue': all_txns.aggregate(total=Sum('amount'))['total'] or 0,
+            'total_transactions': all_txns.count(),
+        }
+
+        return Response(stats)

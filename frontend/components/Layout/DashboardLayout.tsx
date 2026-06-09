@@ -17,9 +17,10 @@ import LanguageSwitcher from '@/components/I18n/LanguageSwitcher';
 
 interface DashboardLayoutProps {
   children: ReactNode;
+  basePath?: string;
 }
 
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
+export default function DashboardLayout({ children, basePath = '/user-dashboard' }: DashboardLayoutProps) {
   const { t } = useTranslation();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -30,16 +31,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   };
 
   const primaryNav = [
-    { name: t('nav.dashboard'), icon: HomeIcon, href: '/user-dashboard' },
-    { name: t('nav.transactions'), icon: ArrowPathIcon, href: '/user-dashboard/transactions' },
-    { name: t('nav.wallet'), icon: WalletIcon, href: '/user-dashboard' },
+    { name: t('nav.dashboard'), icon: HomeIcon, href: basePath },
+    { name: t('nav.transactions'), icon: ArrowPathIcon, href: `${basePath}/transactions` },
+    { name: t('nav.wallet'), icon: WalletIcon, href: basePath },
     { name: t('nav.profile'), icon: UserIcon, href: '/' },
   ];
 
   const bottomNav = [
-    { name: t('nav.dashboard'), icon: HomeIcon, href: '/user-dashboard' },
-    { name: t('nav.transactions'), icon: ArrowPathIcon, href: '/user-dashboard/transactions' },
-    { name: t('nav.wallet'), icon: WalletIcon, href: '/user-dashboard' },
+    { name: t('nav.dashboard'), icon: HomeIcon, href: basePath },
+    { name: t('nav.transactions'), icon: ArrowPathIcon, href: `${basePath}/transactions` },
+    { name: t('nav.wallet'), icon: WalletIcon, href: basePath },
     { name: t('nav.profile'), icon: UserIcon, href: '/' },
   ];
 

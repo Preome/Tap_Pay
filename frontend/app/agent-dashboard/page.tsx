@@ -104,7 +104,7 @@ export default function AgentDashboard() {
   }
 
   return (
-    <DashboardLayout>
+    <DashboardLayout basePath="/agent-dashboard">
       <div className="space-y-6">
         <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-4 md:p-6 text-white">
           <div className="flex flex-col sm:flex-row justify-between items-start gap-3">

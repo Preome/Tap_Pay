@@ -47,9 +47,9 @@ export default function MerchantDashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      const [profileRes, summaryRes, txRes, merchantRes] = await Promise.all([
+      const [profileRes, statsRes, txRes, merchantRes] = await Promise.all([
         authAPI.getProfile(),
-        transactionAPI.getSummary().catch(() => null),
+        merchantAPI.getStats().catch(() => null),
         transactionAPI.getTransactions({ page_size: 5 }),
         merchantAPI.getMyMerchant().catch(() => null),
       ]);
@@ -62,12 +62,13 @@ export default function MerchantDashboard() {
         setMerchantName(merchantRes.data.business_name);
       }
 
-      if (summaryRes?.data) {
-        setStats(prev => ({
-          ...prev,
-          revenueTotal: summaryRes.data.total_received || 0,
-          customerCount: summaryRes.data.transaction_count || 0,
-        }));
+      if (statsRes?.data) {
+        setStats({
+          salesTotal: statsRes.data.today_sales || 0,
+          customerCount: statsRes.data.total_customers || 0,
+          revenueTotal: statsRes.data.total_revenue || 0,
+          qrScans: statsRes.data.total_transactions || 0,
+        });
       }
 
       const txs = txRes.data.results || txRes.data || [];
@@ -100,7 +101,7 @@ export default function MerchantDashboard() {
   const qrImageUrl = merchantCode ? merchantAPI.getQrUrl(merchantCode) : null;
 
   return (
-    <DashboardLayout>
+    <DashboardLayout basePath="/merchant-dashboard">
       <div className="space-y-6">
         <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-4 md:p-6 text-white">
           <h1 className="text-xl md:text-2xl font-bold">{t('merchant.dashboard')}</h1>

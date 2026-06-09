@@ -43,7 +43,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
 
         queryset = Transaction.objects.filter(
-            Q(sender=self.request.user) | Q(receiver=self.request.user) | Q(agent=self.request.user)
+            Q(sender=self.request.user) | Q(receiver=self.request.user) | Q(agent=self.request.user) | Q(merchant__user=self.request.user)
         ).select_related(
             'sender',
             'receiver',

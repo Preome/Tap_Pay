@@ -48,6 +48,8 @@ export const merchantAPI = {
     api.get(`/api/v1/merchants/lookup/${code}/`),
   getMyMerchant: () =>
     api.get('/api/v1/merchants/my_merchant/'),
+  getStats: () =>
+    api.get('/api/v1/merchants/stats/'),
   getQrUrl: (code: string) =>
     `${API_BASE_URL}/api/v1/merchants/qr/${code}/`,
 };
