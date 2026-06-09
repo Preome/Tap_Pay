@@ -23,9 +23,10 @@ interface Transaction {
 
 type TransactionHistoryProps = {
   mode?: 'dashboard' | 'page';
+  agentView?: boolean;
 };
 
-export default function TransactionHistory({ mode = 'dashboard' }: TransactionHistoryProps) {
+export default function TransactionHistory({ mode = 'dashboard', agentView = false }: TransactionHistoryProps) {
   const router = useRouter();
   const { t } = useTranslation();
   const [filter, setFilter] = useState('all');
@@ -52,6 +53,7 @@ export default function TransactionHistory({ mode = 'dashboard' }: TransactionHi
   );
   
   const getTransactionIcon = (type: string) => {
+    if (agentView && type === 'CASH_IN') return <ArrowUpIcon className="h-5 w-5 text-red-500" />;
     switch(type) {
       case 'SEND_MONEY': return <ArrowUpIcon className="h-5 w-5 text-red-500" />;
       case 'CASH_IN': return <ArrowDownIcon className="h-5 w-5 text-green-500" />;
@@ -62,6 +64,7 @@ export default function TransactionHistory({ mode = 'dashboard' }: TransactionHi
   };
   
   const getTransactionTitle = (type: string, data: Transaction) => {
+    if (agentView && type === 'CASH_IN') return `Cash In to ${data.receiver_phone || data.receiver}`;
     switch(type) {
       case 'SEND_MONEY': return `${t('transaction.sentTo')} ${data.receiver_phone || data.receiver}`;
       case 'CASH_IN': return `${t('transaction.cashInFrom')} ${data.agent_phone || data.agent || 'Agent'}`;
@@ -72,6 +75,7 @@ export default function TransactionHistory({ mode = 'dashboard' }: TransactionHi
   };
 
   const isMoneyOut = (type: string) => {
+    if (agentView && type === 'CASH_IN') return true;
     return type === 'SEND_MONEY' || type === 'CASH_OUT' || type === 'MERCHANT_PAYMENT';
   };
 

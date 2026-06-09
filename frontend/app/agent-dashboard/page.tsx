@@ -7,7 +7,6 @@ import {
   UserPlusIcon, 
   BanknotesIcon, 
   UsersIcon, 
-  ArrowTrendingUpIcon,
   ArrowPathIcon,
   ClockIcon
 } from '@heroicons/react/24/outline';
@@ -25,10 +24,10 @@ export default function AgentDashboard() {
   const [activeTab, setActiveTab] = useState('cashin');
   const [balance, setBalance] = useState(0);
   const [stats, setStats] = useState({
-    cashInTotal: 0,
-    cashOutTotal: 0,
+    todayCashIn: 0,
     customersServed: 0,
-    commission: 0,
+    commissionToday: 0,
+    commissionTotal: 0,
   });
   const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
 
@@ -58,21 +57,24 @@ export default function AgentDashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      const [profileRes, summaryRes, txRes] = await Promise.all([
+      const [profileRes, statsRes, txRes] = await Promise.all([
         authAPI.getProfile(),
-        transactionAPI.getSummary().catch(() => null),
+        transactionAPI.getAgentStats().catch((e) => {
+          console.error('Failed to load agent stats:', e);
+          return null;
+        }),
         transactionAPI.getTransactions({ page_size: 5 }),
       ]);
 
       const userData = profileRes.data;
       setBalance(userData.balance || 0);
 
-      if (summaryRes?.data) {
+      if (statsRes?.data) {
         setStats({
-          cashInTotal: summaryRes.data.total_sent || 0,
-          cashOutTotal: summaryRes.data.total_received || 0,
-          customersServed: summaryRes.data.transaction_count || 0,
-          commission: 0,
+          todayCashIn: statsRes.data.today_cash_in || 0,
+          customersServed: statsRes.data.customers_served || 0,
+          commissionToday: statsRes.data.commission_today || 0,
+          commissionTotal: statsRes.data.commission_total || 0,
         });
       }
 
@@ -86,10 +88,9 @@ export default function AgentDashboard() {
   };
 
   const dashboardStats = [
-    { label: t('agent.todaysCashIn'), value: `৳ ${stats.cashInTotal.toLocaleString()}`, icon: BanknotesIcon, change: '', color: 'bg-green-500' },
-    { label: t('agent.todaysCashOut'), value: `৳ ${stats.cashOutTotal.toLocaleString()}`, icon: ArrowTrendingUpIcon, change: '', color: 'bg-red-500' },
+    { label: t('agent.todaysCashIn'), value: `৳ ${stats.todayCashIn.toLocaleString()}`, icon: BanknotesIcon, change: '', color: 'bg-green-500' },
     { label: t('agent.customersServed'), value: stats.customersServed.toString(), icon: UsersIcon, change: '', color: 'bg-blue-500' },
-    { label: t('agent.commissionEarned'), value: `৳ ${stats.commission.toLocaleString()}`, icon: UserPlusIcon, change: '', color: 'bg-purple-500' },
+    { label: t('agent.commissionEarned'), value: `৳ ${stats.commissionTotal.toLocaleString()}`, icon: UserPlusIcon, change: '', color: 'bg-purple-500' },
   ];
 
   if (loading) {
@@ -137,12 +138,12 @@ export default function AgentDashboard() {
             </div>
             <div className="bg-white bg-opacity-20 rounded-lg px-3 md:px-4 py-2 md:py-3">
               <p className="text-xs md:text-sm opacity-90">{t('agent.todaysCommission')}</p>
-              <p className="text-xl md:text-2xl font-bold">৳ {stats.commission.toLocaleString()}</p>
+              <p className="text-xl md:text-2xl font-bold">৳ {stats.commissionToday.toLocaleString()}</p>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
           {dashboardStats.map((stat, index) => (
             <div key={index} className="bg-white rounded-xl p-4 md:p-6 shadow-sm hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between mb-4">
@@ -208,7 +209,7 @@ export default function AgentDashboard() {
 
           <div className="p-4 md:p-6">
             {activeTab === 'cashin' && <CashInForm />}
-            {activeTab === 'history' && <TransactionHistory />}
+            {activeTab === 'history' && <TransactionHistory agentView={true} />}
             {activeTab === 'customers' && (
               <div className="text-center py-8">
                 <UsersIcon className="h-12 w-12 mx-auto mb-3 text-gray-400" />

@@ -91,6 +91,43 @@ class TransactionViewSet(viewsets.ModelViewSet):
 
         return Response(summary)
 
+    @action(detail=False, methods=['get'])
+    def agent_stats(self, request):
+
+        user = request.user
+        if user.user_type != 'AGENT':
+            return Response({'error': 'Only agents can access this'}, status=status.HTTP_403_FORBIDDEN)
+
+        today = timezone.now().date()
+
+        today_cash_ins = Transaction.objects.filter(
+            agent=user,
+            transaction_type='CASH_IN',
+            status='COMPLETED',
+            created_at__date=today
+        )
+
+        all_cash_ins = Transaction.objects.filter(
+            agent=user,
+            transaction_type='CASH_IN',
+            status='COMPLETED'
+        )
+
+        today_cash_in = today_cash_ins.aggregate(total=Sum('amount'))['total'] or 0
+        customers_served = all_cash_ins.values('receiver').distinct().count()
+        total_cash_in = all_cash_ins.aggregate(total=Sum('amount'))['total'] or 0
+
+        commission_rate = Decimal('0.005')
+        commission_today = (today_cash_in * commission_rate).quantize(Decimal('0.01'))
+        commission_total = (total_cash_in * commission_rate).quantize(Decimal('0.01'))
+
+        return Response({
+            'today_cash_in': today_cash_in,
+            'customers_served': customers_served,
+            'commission_today': commission_today,
+            'commission_total': commission_total,
+        })
+
     @action(detail=False, methods=['post'])
     def cash_in(self, request):
 

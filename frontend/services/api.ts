@@ -41,6 +41,8 @@ export const transactionAPI = {
     api.get(`/api/v1/transactions/${id}/`),
   getSummary: () => 
     api.get('/api/v1/transactions/summary/'),
+  getAgentStats: () =>
+    api.get('/api/v1/transactions/agent_stats/'),
 };
 
 export const merchantAPI = {
