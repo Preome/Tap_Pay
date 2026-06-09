@@ -12,6 +12,27 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/', request.url))
   }
 
+  if (isProtectedRoute && token) {
+    const userCookie = request.cookies.get('user')?.value
+    if (userCookie) {
+      try {
+        const user = JSON.parse(decodeURIComponent(userCookie))
+        const userType = user.user_type || user.userType
+        if (pathname.startsWith('/user-dashboard') && userType !== 'USER') {
+          return NextResponse.redirect(new URL('/', request.url))
+        }
+        if (pathname.startsWith('/merchant-dashboard') && userType !== 'MERCHANT') {
+          return NextResponse.redirect(new URL('/', request.url))
+        }
+        if (pathname.startsWith('/agent-dashboard') && userType !== 'AGENT') {
+          return NextResponse.redirect(new URL('/', request.url))
+        }
+      } catch {
+        return NextResponse.redirect(new URL('/', request.url))
+      }
+    }
+  }
+
   return NextResponse.next()
 }
 

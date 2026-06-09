@@ -32,6 +32,11 @@ export default function MerchantDashboard() {
     
     try {
       const parsedUser = JSON.parse(userData);
+      const ut = parsedUser.user_type || parsedUser.userType;
+      if (ut !== 'MERCHANT') {
+        router.push('/');
+        return;
+      }
       setUser(parsedUser);
       fetchDashboardData();
     } catch (error) {

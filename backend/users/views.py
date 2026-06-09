@@ -131,6 +131,9 @@ class TransactionViewSet(viewsets.ModelViewSet):
     def send_money(self, request):
 
         sender = request.user
+        if sender.user_type != 'USER':
+            return Response({'error': 'Only users can send money'}, status=status.HTTP_403_FORBIDDEN)
+
         receiver_phone = request.data.get('receiver_phone')
         amount = Decimal(request.data.get('amount', 0))
 
@@ -165,6 +168,9 @@ class TransactionViewSet(viewsets.ModelViewSet):
     def merchant_payment(self, request):
 
         user = request.user
+        if user.user_type != 'USER':
+            return Response({'error': 'Only users can make merchant payments'}, status=status.HTTP_403_FORBIDDEN)
+
         merchant_code = request.data.get('merchant_code')
         amount = Decimal(request.data.get('amount', 0))
 

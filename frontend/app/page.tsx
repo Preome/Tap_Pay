@@ -51,15 +51,16 @@ export default function LoginPage() {
       localStorage.setItem('token', tokenData.token);
       const { data: userData } = await authAPI.getProfile();
       localStorage.setItem('user', JSON.stringify(userData));
-      localStorage.setItem('userType', userType);
+      localStorage.setItem('userType', userData.user_type || userData.userType);
       document.cookie = `token=${tokenData.token}; path=/; max-age=86400`;
       document.cookie = `user=${encodeURIComponent(JSON.stringify(userData))}; path=/; max-age=86400`;
 
       toast.success(`${t('common.welcome')} ${userData.username || 'User'}!`);
 
-      if (userType === 'MERCHANT') window.location.href = '/merchant-dashboard';
-      else if (userType === 'AGENT') window.location.href = '/agent-dashboard';
-      else if (userType === 'USER') window.location.href = '/user-dashboard';
+      const ut = userData.user_type || userData.userType;
+      if (ut === 'MERCHANT') window.location.href = '/merchant-dashboard';
+      else if (ut === 'AGENT') window.location.href = '/agent-dashboard';
+      else if (ut === 'USER') window.location.href = '/user-dashboard';
       else window.location.href = '/';
     } catch (error: any) {
       const msg = error?.response?.data?.non_field_errors?.[0] || t('auth.loginFailed');

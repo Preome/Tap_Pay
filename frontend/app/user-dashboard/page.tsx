@@ -29,6 +29,11 @@ export default function UserDashboard() {
     
     try {
       const parsedUser = JSON.parse(userData);
+      const ut = parsedUser.user_type || parsedUser.userType;
+      if (ut !== 'USER') {
+        router.push('/');
+        return;
+      }
       setUser(parsedUser);
       fetchDashboardData();
     } catch (error) {
