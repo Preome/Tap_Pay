@@ -114,12 +114,7 @@ export default function AgentDashboard() {
               <div className="mt-2">
                 <p className="text-base md:text-lg">{t('agent.welcomeBack')}, {user?.username || 'Agent'}!</p>
                 <div className="flex flex-wrap items-center gap-2 mt-2 text-xs md:text-sm">
-                  <span className="bg-white bg-opacity-20 px-2 md:px-3 py-1 rounded-full">
-                    {t('common.phone')}: {user?.phone_number}
-                  </span>
-                  <span className="bg-white bg-opacity-20 px-2 md:px-3 py-1 rounded-full">
-                    {t('common.id')}: {user?.id}
-                  </span>
+                  {/* Phone/ID removed from agent dashboard */}
                 </div>
               </div>
             </div>
