@@ -51,7 +51,8 @@ class TransactionViewSet(viewsets.ModelViewSet):
             'merchant'
         ).prefetch_related(
             'merchant__user'
-        )
+        ).order_by('-created_at')
+
 
         transaction_type = self.request.query_params.get('type')
         if transaction_type:
