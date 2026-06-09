@@ -31,7 +31,11 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         business_address = validated_data.pop('business_address', '')
         user = User.objects.create_user(**validated_data)
 
-        Wallet.objects.create(user=user, balance=0)
+        # Initialize wallet PIN.
+        # This project uses the User model's `pin` field as the transaction PIN.
+        Wallet.objects.create(user=user, balance=0, pin=user.pin)
+
+
 
         if validated_data.get('user_type') == 'MERCHANT' and registration_number:
             Merchant.objects.create(

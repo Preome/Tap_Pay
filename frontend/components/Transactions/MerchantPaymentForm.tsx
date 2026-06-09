@@ -49,6 +49,7 @@ export default function MerchantPaymentForm({ onSuccess }: MerchantPaymentFormPr
       await transactionAPI.merchantPayment({
         merchant_code: data.merchant_code,
         amount: data.amount,
+        pin: data.pin,
       });
       toast.success(`${t('common.success')} ${data.amount} BDT`);
       reset();

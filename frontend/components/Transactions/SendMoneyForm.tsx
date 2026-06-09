@@ -28,6 +28,7 @@ export default function SendMoneyForm({ onSuccess }: SendMoneyFormProps) {
       await transactionAPI.sendMoney({
         receiver_phone: data.receiver_phone,
         amount: data.amount,
+        pin: data.pin,
       });
       toast.success(`${t('common.success')} ${data.amount} BDT`);
       reset();

@@ -165,15 +165,78 @@ class TransactionViewSet(viewsets.ModelViewSet):
         except User.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
+    @action(detail=False, methods=['post'], url_path='set_wallet_pin')
+    def set_wallet_pin(self, request):
+
+
+        user = request.user
+        if user.user_type != 'USER':
+            return Response({'error': 'Only users can set wallet PIN'}, status=status.HTTP_403_FORBIDDEN)
+
+        pin = request.data.get('pin')
+        if pin is None or str(pin).strip() == '':
+            return Response({'error': 'PIN is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if len(str(pin)) != 4 or not str(pin).isdigit():
+            return Response({'error': 'Invalid PIN: must be a 4-digit number'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            wallet = Wallet.objects.get(user=user)
+        except Wallet.DoesNotExist:
+            return Response({'error': 'Wallet not found'}, status=status.HTTP_400_BAD_REQUEST)
+
+        wallet.pin = str(pin)
+        wallet.save(update_fields=['pin'])
+        return Response({'status': 'ok'}, status=status.HTTP_200_OK)
+
     @action(detail=False, methods=['post'])
     def send_money(self, request):
+
 
         sender = request.user
         if sender.user_type != 'USER':
             return Response({'error': 'Only users can send money'}, status=status.HTTP_403_FORBIDDEN)
 
         receiver_phone = request.data.get('receiver_phone')
-        amount = Decimal(request.data.get('amount', 0))
+        pin = request.data.get('pin')
+
+        if receiver_phone in (None, ''):
+            return Response({'error': 'receiver_phone is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Parse amount safely and reject blanks early
+        amount_raw = request.data.get('amount', None)
+        if amount_raw in (None, ''):
+            return Response({'error': 'amount is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            amount = Decimal(str(amount_raw))
+        except Exception:
+            return Response({'error': 'Invalid amount: must be a number'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if amount <= 0:
+            return Response({'error': 'Invalid amount: must be greater than 0'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if pin is None or str(pin).strip() == '':
+            return Response({'error': 'PIN is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Basic PIN sanity check (backend requires wallet.pin to match exactly)
+        if len(str(pin)) != 4 or not str(pin).isdigit():
+            return Response({'error': 'Invalid PIN: must be a 4-digit number'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+        # Validate PIN against sender wallet pin
+        try:
+            sender_wallet = Wallet.objects.get(user=sender)
+        except Wallet.DoesNotExist:
+            return Response({'error': 'Wallet not found'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not sender_wallet.pin:
+            return Response({'error': 'PIN not set for wallet'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if str(pin) != str(sender_wallet.pin):
+            return Response({'error': 'Invalid PIN'}, status=status.HTTP_400_BAD_REQUEST)
+
+
 
         try:
             from users.models import User
@@ -211,6 +274,18 @@ class TransactionViewSet(viewsets.ModelViewSet):
 
         merchant_code = request.data.get('merchant_code')
         amount = Decimal(request.data.get('amount', 0))
+        pin = request.data.get('pin')
+
+        if pin is None or pin == '':
+            return Response({'error': 'PIN is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user_wallet = Wallet.objects.get(user=user)
+        except Wallet.DoesNotExist:
+            return Response({'error': 'Wallet not found'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not user_wallet.pin or str(pin) != str(user_wallet.pin):
+            return Response({'error': 'Invalid PIN'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             from merchants.models import Merchant
